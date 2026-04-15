@@ -22,18 +22,17 @@
             </div>
 
             <div>
-                <label for="tipe_surat" class="block text-sm font-medium text-gray-700 mb-2">Filter Jenis Surat</label>
-                <select id="tipe_surat" name="tipe_surat"
+                <label for="letter_type" class="block text-sm font-medium text-gray-700 mb-2">Filter Jenis Surat</label>
+                <select id="letter_type" name="letter_type"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="">-- Semua Jenis --</option>
-                    <option value="Surat Baptisan" {{ request('tipe_surat') === 'Surat Baptisan' ? 'selected' : '' }}>Surat Baptisan</option>
-                    <option value="Surat Pernikahan" {{ request('tipe_surat') === 'Surat Pernikahan' ? 'selected' : '' }}>Surat Pernikahan</option>
-                    <option value="Surat Serah Nikah" {{ request('tipe_surat') === 'Surat Serah Nikah' ? 'selected' : '' }}>Surat Serah Nikah</option>
-                    <option value="Surat Kematian" {{ request('tipe_surat') === 'Surat Kematian' ? 'selected' : '' }}>Surat Kematian</option>
-                    <option value="Surat Keluar Jemaat" {{ request('tipe_surat') === 'Surat Keluar Jemaat' ? 'selected' : '' }}>Surat Keluar Jemaat</option>
-                    <option value="Surat Masuk Jemaat" {{ request('tipe_surat') === 'Surat Masuk Jemaat' ? 'selected' : '' }}>Surat Masuk Jemaat</option>
-                    <option value="Surat Keterangan Jemaat" {{ request('tipe_surat') === 'Surat Keterangan Jemaat' ? 'selected' : '' }}>Surat Keterangan Jemaat</option>
-                    <option value="Surat Rekomendasi" {{ request('tipe_surat') === 'Surat Rekomendasi' ? 'selected' : '' }}>Surat Rekomendasi</option>
+                    @if(isset($types))
+                        @foreach($types as $typeKey => $typeName)
+                            <option value="{{ $typeKey }}" {{ request('letter_type') === $typeKey ? 'selected' : '' }}>
+                                {{ $typeName }}
+                            </option>
+                        @endforeach
+                    @endif
                 </select>
             </div>
 

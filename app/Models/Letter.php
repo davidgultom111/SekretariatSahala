@@ -12,11 +12,18 @@ class Letter extends Model
     protected $fillable = [
         'member_id',
         'tipe_surat',
+        'letter_type',
         'nomor_surat',
         'tanggal_surat',
+        'tahun_bergabung',
+        'tgl_mulai_tugas',
+        'tgl_akhir_tugas',
+        'tujuan_tugas',
         'keterangan',
         'isi_surat',
+        'template_content',
         'file_path',
+        'pdf_path',
     ];
 
     protected $casts = [
