@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('letters', function (Blueprint $table) {
-            $table->text('isi_surat')->nullable()->change();
+            // Kolom khusus untuk Surat Nilai Sekolah
+            $table->string('asal_sekolah')->nullable();
+            $table->string('kelas')->nullable();
+            $table->string('semester')->nullable();
+            $table->integer('nilai')->default(90)->nullable();
         });
     }
 
@@ -21,9 +25,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Don't revert - isi_surat should remain nullable
-        // Schema::table('letters', function (Blueprint $table) {
-        //     $table->text('isi_surat')->nullable(false)->change();
-        // });
+        Schema::table('letters', function (Blueprint $table) {
+            $table->dropColumn(['asal_sekolah', 'kelas', 'semester', 'nilai']);
+        });
     }
 };

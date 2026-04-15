@@ -24,6 +24,18 @@ class Letter extends Model
         'template_content',
         'file_path',
         'pdf_path',
+        'asal_sekolah',
+        'kelas',
+        'semester',
+        'nilai',
+        'nama_ayah',
+        'nama_ibu',
+        'nama_anak',
+        'tempat_lahir_anak',
+        'tanggal_lahir_anak',
+        'member_pria_id',
+        'member_wanita_id',
+        'tanggal_pernikahan',
     ];
 
     protected $casts = [
@@ -36,5 +48,21 @@ class Letter extends Model
     public function member()
     {
         return $this->belongsTo(Member::class);
+    }
+
+    /**
+     * Get the mempelai pria (groom).
+     */
+    public function memberPria()
+    {
+        return $this->belongsTo(Member::class, 'member_pria_id');
+    }
+
+    /**
+     * Get the mempelai wanita (bride).
+     */
+    public function memberWanita()
+    {
+        return $this->belongsTo(Member::class, 'member_wanita_id');
     }
 }

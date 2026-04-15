@@ -11,7 +11,7 @@ class LetterController extends Controller
 {
     public function index()
     {
-        $letters = Letter::with('member')->paginate(10);
+        $letters = Letter::with('member')->orderBy('created_at', 'desc')->paginate(10);
         $types = LetterTemplateService::getLetterTypes();
         return view('letter.index', compact('letters', 'types'));
     }
@@ -66,6 +66,31 @@ class LetterController extends Controller
             $rules['tahun_bergabung'] = 'required|integer|min:1900|max:' . date('Y');
         }
 
+        // Validasi khusus untuk surat nilai sekolah
+        if ($request->input('letter_type') === 'surat_nilai_sekolah') {
+            $rules['asal_sekolah'] = 'required|string|min:3';
+            $rules['kelas'] = 'required|string|min:1';
+            $rules['semester'] = 'required|string|min:1';
+            $rules['nilai'] = 'nullable|integer|min:0|max:100';
+        }
+
+        // Validasi khusus untuk surat penyerahan anak
+        if ($request->input('letter_type') === 'surat_pengajuan_penyerahan_anak') {
+            $rules['nama_ayah'] = 'required|string|min:3';
+            $rules['nama_ibu'] = 'required|string|min:3';
+            $rules['nama_anak'] = 'required|string|min:1';
+            $rules['tempat_lahir_anak'] = 'required|string|min:3';
+            $rules['tanggal_lahir_anak'] = 'required|date';
+        }
+
+        // Validasi khusus untuk surat pengajuan pernikahan
+        if ($request->input('letter_type') === 'surat_pengajuan_pernikahan') {
+            $rules['member_id'] = 'nullable'; // member_id tidak wajib untuk pernikahan
+            $rules['member_pria_id'] = 'required|exists:members,id';
+            $rules['member_wanita_id'] = 'required|exists:members,id';
+            $rules['tanggal_pernikahan'] = 'required|date|after_or_equal:tanggal_surat';
+        }
+
         $validated = $request->validate($rules);
 
         $typeName = $allTypes[$validated['letter_type']];
@@ -73,8 +98,13 @@ class LetterController extends Controller
         // Generate nomor surat otomatis
         $nomorSurat = LetterTemplateService::generateLetterNumber($validated['letter_type']);
         
+        // Untuk surat pernikahan, gunakan member_pria_id sebagai member_id utama
+        $memberId = $validated['letter_type'] === 'surat_pengajuan_pernikahan' 
+            ? $validated['member_pria_id'] 
+            : $validated['member_id'];
+        
         $letterData = [
-            'member_id' => $validated['member_id'],
+            'member_id' => $memberId,
             'tipe_surat' => $typeName,
             'letter_type' => $validated['letter_type'],
             'nomor_surat' => $nomorSurat,
@@ -94,6 +124,30 @@ class LetterController extends Controller
             $letterData['tahun_bergabung'] = $validated['tahun_bergabung'];
         }
 
+        // Tambah data nilai sekolah jika jenis suratnya adalah surat nilai sekolah
+        if ($validated['letter_type'] === 'surat_nilai_sekolah') {
+            $letterData['asal_sekolah'] = $validated['asal_sekolah'];
+            $letterData['kelas'] = $validated['kelas'];
+            $letterData['semester'] = $validated['semester'];
+            $letterData['nilai'] = $validated['nilai'] ?? 90;
+        }
+
+        // Tambah data penyerahan anak jika jenis suratnya adalah surat penyerahan anak
+        if ($validated['letter_type'] === 'surat_pengajuan_penyerahan_anak') {
+            $letterData['nama_ayah'] = $validated['nama_ayah'];
+            $letterData['nama_ibu'] = $validated['nama_ibu'];
+            $letterData['nama_anak'] = $validated['nama_anak'];
+            $letterData['tempat_lahir_anak'] = $validated['tempat_lahir_anak'];
+            $letterData['tanggal_lahir_anak'] = $validated['tanggal_lahir_anak'];
+        }
+
+        // Tambah data pernikahan jika jenis suratnya adalah surat pengajuan pernikahan
+        if ($validated['letter_type'] === 'surat_pengajuan_pernikahan') {
+            $letterData['member_pria_id'] = $validated['member_pria_id'];
+            $letterData['member_wanita_id'] = $validated['member_wanita_id'];
+            $letterData['tanggal_pernikahan'] = $validated['tanggal_pernikahan'];
+        }
+
         $letter = Letter::create($letterData);
 
         return redirect()->route('letter.show', $letter)->with('success', 'Surat berhasil dibuat dengan nomor: ' . $nomorSurat);
@@ -111,12 +165,16 @@ class LetterController extends Controller
 
     public function pdf(Letter $letter)
     {
-        // This will generate PDF - you'll need to install dompdf
-        $number = $letter->nomor_surat;
+        // Replace "/" dengan "-" untuk membuat filename yang valid
+        $number = str_replace('/', '-', $letter->nomor_surat);
         $filename = "surat-{$number}.pdf";
         
-        return \Barryvdh\DomPDF\Facade\Pdf::loadView('letter.print', compact('letter'))
-            ->download($filename);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('letter.print', compact('letter'));
+        
+        // Set paper size untuk match dengan cetak browser
+        $pdf->setPaper('A4', 'portrait');
+        
+        return $pdf->download($filename);
     }
 
     public function destroy(Letter $letter)
@@ -139,7 +197,7 @@ class LetterController extends Controller
             $query->where('letter_type', $request->letter_type);
         }
 
-        $letters = $query->paginate(10);
+        $letters = $query->orderBy('created_at', 'desc')->paginate(10);
         $types = LetterTemplateService::getLetterTypes();
 
         return view('letter.index', compact('letters', 'types'));

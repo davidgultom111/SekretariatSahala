@@ -25,16 +25,20 @@ class LetterTemplateService
     }
 
     /**
-     * Helper untuk memformat identitas jemaat agar seragam
+     * Helper Tabel Identitas untuk hasil PDF yang presisi
      */
-    private static function getMemberIdentity(Member $member)
+    private static function renderIdentityTable($rows)
     {
-        $tglLahir = $member->tanggal_lahir ? Carbon::parse($member->tanggal_lahir)->translatedFormat('d F Y') : '-';
-        
-        return "Nama                    : {$member->nama_lengkap}\n" .
-               "No. Identitas           : " . ($member->no_identitas ?? '-') . "\n" .
-               "Tempat/Tanggal Lahir    : {$member->tempat_lahir} / {$tglLahir}\n" .
-               "Alamat                  : {$member->alamat}";
+        $html = '<table style="width: 100%; border-collapse: collapse; margin-bottom: 2mm;">';
+        foreach ($rows as $label => $value) {
+            $html .= '<tr>';
+            $html .= '<td style="width: 45mm; vertical-align: top; padding: 0.5mm 0;">' . $label . '</td>';
+            $html .= '<td style="width: 5mm; vertical-align: top; padding: 0.5mm 0; text-align: center;">:</td>';
+            $html .= '<td style="vertical-align: top; padding: 0.5mm 0;">' . $value . '</td>';
+            $html .= '</tr>';
+        }
+        $html .= '</table>';
+        return $html;
     }
 
     public static function generateLetterNumber($letterType)
@@ -52,10 +56,6 @@ class LetterTemplateService
         return $letterNumber;
     }
 
-    /**
-     * Get preview nomor surat TANPA increment counter
-     * Digunakan untuk form preview di halaman create
-     */
     public static function getLetterNumberPreview($letterType)
     {
         $currentYear = now()->year;
@@ -82,9 +82,6 @@ class LetterTemplateService
         };
     }
 
-    /**
-     * Digunakan untuk tampilan preview di Web/Admin
-     */
     public static function getLetterOpeningText($type)
     {
         return match ($type) {
@@ -95,79 +92,74 @@ class LetterTemplateService
         };
     }
 
-    /**
-     * Menghasilkan Body Surat (Hanya bagian isi setelah data diri)
-     * Parameter bisa Member atau Letter object (untuk data khusus seperti tugas pelayanan)
-     */
-    public static function generateLetterBody($type, $memberOrLetter = null)
+    public static function generateLetterBody($type, $letter)
     {
-        // Handle Letter object untuk surat dengan data tambahan
-        if ($memberOrLetter && class_basename($memberOrLetter) === 'Letter') {
-            $letter = $memberOrLetter;
-            $member = $letter->member;
-            
-            if ($type === 'surat_tugas_pelayanan' && $letter->tujuan_tugas) {
-                $tglMulai = $letter->tgl_mulai_tugas ? Carbon::parse($letter->tgl_mulai_tugas)->translatedFormat('d F Y') : '............................';
-                $tglAkhir = $letter->tgl_akhir_tugas ? Carbon::parse($letter->tgl_akhir_tugas)->translatedFormat('d F Y') : '............................';
+        // Pastikan $letter adalah instance model Letter
+        if (!$letter || class_basename($letter) !== 'Letter') return "";
+
+        switch ($type) {
+            case 'surat_tugas_pelayanan':
+                $tglMulai = $letter->tgl_mulai_tugas ? Carbon::parse($letter->tgl_mulai_tugas)->translatedFormat('d F Y') : '-';
+                $tglAkhir = $letter->tgl_akhir_tugas ? Carbon::parse($letter->tgl_akhir_tugas)->translatedFormat('d F Y') : '-';
                 
-                return "Telah ditugaskan untuk melakukan pelayanan sesuai dengan tujuan tugas yang tertera dibawah ini, dengan perincian tugas sebagai berikut:\n\n" .
-                       "Tanggal Mulai       : {$tglMulai}\n" .
-                       "Tanggal Akhir       : {$tglAkhir}\n" .
-                       "Tujuan Tugas        :\n{$letter->tujuan_tugas}\n\n" .
-                       "Semoga dengan tugas ini dapat melayani dengan sepenuh hati kepada Tuhan dan sesama.";
-            }
+                $data = [
+                    'Tanggal Mulai' => $tglMulai,
+                    'Tanggal Akhir' => $tglAkhir,
+                    'Tujuan Tugas' => $letter->tujuan_tugas
+                ];
+                
+                return "<p style='margin-bottom: 2mm;'>Telah ditugaskan untuk melakukan pelayanan dengan perincian sebagai berikut:</p>" . 
+                       self::renderIdentityTable($data) .
+                       "<p style='margin-top: 2mm;'>Semoga dapat melayani dengan sepenuh hati kepada Tuhan dan sesama.</p>";
 
-            if ($type === 'surat_pengantar' && $letter->keterangan) {
-                return "Adalah anggota jemaat Gereja Pantekosta di Indonesia Jemaat Sahabat Allah dan terdaftar dalam daftar anggota kami.\n\n" .
-                       "Adapun surat pengantar ini diberikan untuk keperluan:\n{$letter->keterangan}\n\n" .
-                       "Demikian surat pengantar ini dibuat agar dapat dipergunakan sebagaimana mestinya.";
-            }
+            case 'surat_pengantar':
+                return "<p>Adalah anggota jemaat Gereja Pantekosta di Indonesia Jemaat Sahabat Allah dan terdaftar dalam daftar anggota kami.</p>" .
+                       "<p style='margin-top: 3mm;'>Adapun surat pengantar ini diberikan untuk keperluan: <strong>{$letter->keterangan}</strong></p>" .
+                       "<p style='margin-top: 3mm;'>Demikian surat pengantar ini dibuat agar dapat dipergunakan sebagaimana mestinya.</p>";
 
-            if ($type === 'surat_keterangan_jemaat_aktif' && $letter->tahun_bergabung) {
-                return "Adalah benar anggota jemaat Gereja Pantekosta di Indonesia Jemaat Sahabat Allah Palembang yang aktif dan terdaftar dalam keikutsertaan agenda ibadah jemaat sejak tahun {$letter->tahun_bergabung}.\n\n" .
-                       "Demikian surat keterangan ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.";
-            }
+            case 'surat_keterangan_jemaat_aktif':
+                return "<p>Adalah benar anggota jemaat Gereja Pantekosta di Indonesia Jemaat Sahabat Allah Palembang yang aktif dan terdaftar dalam keikutsertaan agenda ibadah jemaat sejak tahun <strong>{$letter->tahun_bergabung}</strong>.</p>" .
+                       "<p style='margin-top: 4mm;'>Demikian surat keterangan ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.</p>";
+
+            case 'surat_nilai_sekolah':
+                $data = [
+                    'Asal Sekolah' => $letter->asal_sekolah,
+                    'Kelas/Tingkat' => $letter->kelas ?? '-',
+                    'Semester' => $letter->semester ?? '-',
+                ];
+                $nilai = $letter->nilai ?? 90;
+
+                return self::renderIdentityTable($data) .
+                       "<p style='margin-top: 3mm;'>Siswa/siswi tersebut telah mengikuti kegiatan ibadah dan pembelajaran agama di GPdI Jemaat Sahabat Allah Palembang dengan nilai:</p>" .
+                       "<div style='text-align: center; font-size: 14pt; font-weight: bold; margin-top: 4mm;'>[ {$nilai} ]</div>";
+
+            case 'surat_pengajuan_penyerahan_anak':
+                $data = [
+                    'Nama Ayah' => $letter->nama_ayah ?? '-',
+                    'Nama Ibu' => $letter->nama_ibu ?? '-',
+                    'Nama Anak' => $letter->nama_anak,
+                    'Tempat/Tgl Lahir' => ($letter->tempat_lahir_anak ?? '-') . " / " . ($letter->tanggal_lahir_anak ? Carbon::parse($letter->tanggal_lahir_anak)->translatedFormat('d F Y') : '-')
+                ];
+                return self::renderIdentityTable($data) .
+                       "<p style='margin-top: 3mm;'>Orang tua dari anak tersebut ingin menyerahkan anak mereka kepada Tuhan dan memohon doa restu dalam ibadah penyerahan anak.</p>";
+
+            case 'surat_pengajuan_pernikahan':
+                $tglNikah = $letter->tanggal_pernikahan ? Carbon::parse($letter->tanggal_pernikahan)->translatedFormat('d F Y') : '-';
+                $data = [
+                    'Mempelai Pria' => $letter->memberPria->nama_lengkap ?? '-',
+                    'Mempelai Wanita' => $letter->memberWanita->nama_lengkap ?? '-',
+                    'Rencana Nikah' => $tglNikah,
+                    'Tempat' => 'GPdI Sahabat Allah Palembang'
+                ];
+                return "<p style='margin-bottom: 2mm;'>Calon mempelai telah siap untuk memasuki ikatan pernikahan kudus. Kami memohon agar proses bimbingan dan upacara pernikahan dapat dilaksanakan pada:</p>" .
+                       self::renderIdentityTable($data);
+
+            case 'surat_pengajuan_baptisan':
+                return "<p>Jemaat tersebut telah menyatakan komitmennya menerima Yesus Kristus sebagai Tuhan dan Juru Selamat pribadi, dan rindu untuk dibaptis air sebagai tanda pernyataan imannya.</p>" .
+                       "<p style='margin-top: 3mm;'>Kami memohon agar calon baptis ini dapat disertakan pada upacara pembaptisan berikutnya.</p>";
+
+            default:
+                return "";
         }
-
-        // Handle Member object (backward compatibility)
-        $member = is_object($memberOrLetter) && class_basename($memberOrLetter) === 'Letter' ? $memberOrLetter->member : $memberOrLetter;
-
-        return match ($type) {
-            'surat_tugas_pelayanan' => 
-                "Telah ditugaskan untuk melakukan pelayanan di Gereja Pantekosta Jemaat Sahabat Allah Palembang mulai tanggal sebagaimana tercantum dalam surat keputusan yang terpisah.\n\nSemoga dengan tugas ini dapat melayani dengan sepenuh hati kepada Tuhan dan sesama.",
-            
-            'surat_pengantar' => 
-                "Adalah anggota jemaat Gereja Pantekosta di Indonesia Jemaat Sahabat Allah yang aktif dan terdaftar dalam daftar anggota kami.\n\nSurat pengantar ini diberikan untuk keperluan sebagaimana dimaksud agar dapat dipergunakan sebagaimana mestinya.",
-            
-            'surat_keterangan_jemaat_aktif' => 
-                "Adalah benar anggota jemaat Gereja Pantekosta di Indonesia Jemaat Sahabat Allah Palembang yang aktif dan terdaftar dalam keikutsertaan agenda ibadah jemaat sejak tahun .....\n\nDemikian surat keterangan ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.",
-            
-            'surat_nilai_sekolah' => 
-                "Sekolah/Tempat Belajar : .............................\nKelas/Tingkat          : .............................\n\nSiswa/siswi tersebut telah mengikuti kegiatan ibadah dan pembelajaran agama di Gereja Pantekosta Jemaat Sahabat Allah dengan nilai:\n\n[ ............................. ]",
-            
-            'surat_pengajuan_baptisan' => 
-                "Jemaat tersebut telah menyatakan komitmennya menerima Yesus Kristus sebagai Tuhan dan Juru Selamat pribadi, dan rindu untuk dibaptis air sebagai tanda pernyataan imannya.\n\nKami memohon agar calon baptis ini dapat disertakan pada upacara pembaptisan berikutnya.",
-            
-            'surat_pengajuan_penyerahan_anak' => 
-                "Nama Anak              : .............................\nTempat/Tanggal Lahir   : .............................\n\nOrang tua dari anak tersebut ingin menyerahkan anak mereka kepada Tuhan dan memohon doa restu dalam ibadah penyerahan anak.",
-            
-            'surat_pengajuan_pernikahan' => 
-                "Calon mempelai telah siap untuk memasuki ikatan pernikahan kudus. Kami memohon agar proses bimbingan dan upacara pernikahan dapat dilaksanakan pada:\n\nHari/Tanggal : ............................\nTempat       : ............................",
-            
-            default => "",
-        };
-    }
-
-    /**
-     * Full Template (Untuk Preview Cepat di Textarea)
-     */
-    public static function generateLetterContent($type, Member $member)
-    {
-        $title = strtoupper(str_replace('_', ' ', $type));
-        $opening = self::getLetterOpeningText($type);
-        $identity = self::getMemberIdentity($member);
-        $body = self::generateLetterBody($type, $member);
-
-        return "{$title}\n\n{$opening}\n\n{$identity}\n\n{$body}\n\nPalembang, " . now()->translatedFormat('d F Y') . "\n\nGembala Sidang";
     }
 }

@@ -119,6 +119,125 @@
             </div>
         @endif
 
+        {{-- Tampilkan data nilai sekolah jika letter type-nya surat_nilai_sekolah --}}
+        @if ($letter->letter_type === 'surat_nilai_sekolah' && $letter->asal_sekolah)
+            <div class="mb-8 pb-8 border-b border-gray-300">
+                <h2 class="text-lg font-bold text-gray-900 mb-4">📚 Data Nilai Sekolah</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <p class="text-sm text-gray-500">Asal Sekolah/Tempat Belajar</p>
+                        <p class="text-lg font-semibold text-green-900">{{ $letter->asal_sekolah }}</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <p class="text-sm text-gray-500">Kelas/Tingkat</p>
+                        <p class="text-lg font-semibold text-green-900">{{ $letter->kelas }}</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <p class="text-sm text-gray-500">Semester</p>
+                        <p class="text-lg font-semibold text-green-900">{{ $letter->semester }}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <p class="text-sm text-gray-500">Nilai Agama</p>
+                        <p class="text-2xl font-bold text-blue-900">{{ $letter->nilai ?? 90 }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Tampilkan data penyerahan anak jika letter type-nya surat_pengajuan_penyerahan_anak --}}
+        @if ($letter->letter_type === 'surat_pengajuan_penyerahan_anak' && $letter->nama_anak)
+            <div class="mb-8 pb-8 border-b border-gray-300">
+                <h2 class="text-lg font-bold text-gray-900 mb-4">👨‍👩‍👧 Data Penyerahan Anak</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-pink-50 p-4 rounded-lg border border-pink-200">
+                        <p class="text-sm text-gray-500">Nama Ayah</p>
+                        <p class="text-lg font-semibold text-pink-900">{{ $letter->nama_ayah }}</p>
+                    </div>
+                    <div class="bg-pink-50 p-4 rounded-lg border border-pink-200">
+                        <p class="text-sm text-gray-500">Nama Ibu</p>
+                        <p class="text-lg font-semibold text-pink-900">{{ $letter->nama_ibu }}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <p class="text-sm text-gray-500">Nama Anak</p>
+                        <p class="text-lg font-semibold text-blue-900">{{ $letter->nama_anak }}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <p class="text-sm text-gray-500">Tempat Lahir</p>
+                        <p class="text-lg font-semibold text-blue-900">{{ $letter->tempat_lahir_anak }}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 md:col-span-2">
+                        <p class="text-sm text-gray-500">Tanggal Lahir</p>
+                        <p class="text-lg font-semibold text-blue-900">{{ $letter->tanggal_lahir_anak ? \Carbon\Carbon::parse($letter->tanggal_lahir_anak)->translatedFormat('d F Y') : '-' }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Tampilkan data pernikahan jika letter type-nya surat_pengajuan_pernikahan --}}
+        @if ($letter->letter_type === 'surat_pengajuan_pernikahan' && $letter->member_pria_id && $letter->member_wanita_id)
+            <div class="mb-8 pb-8 border-b border-gray-300">
+                <h2 class="text-lg font-bold text-gray-900 mb-4">💍 Data Pengajuan Pernikahan</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-red-50 p-4 rounded-lg border-2 border-red-300">
+                        <h3 class="font-bold text-red-900 mb-3">👨 Mempelai Pria</h3>
+                        <div class="space-y-2 text-sm">
+                            <div>
+                                <p class="text-gray-500">Nama</p>
+                                <p class="font-semibold text-red-900">{{ $letter->memberPria->nama_lengkap }}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">No. Identitas</p>
+                                <p class="font-semibold text-red-900">{{ $letter->memberPria->no_identitas }}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Tempat Lahir</p>
+                                <p class="font-semibold text-red-900">{{ $letter->memberPria->tempat_lahir }}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Tanggal Lahir</p>
+                                <p class="font-semibold text-red-900">{{ $letter->memberPria->tanggal_lahir ? \Carbon\Carbon::parse($letter->memberPria->tanggal_lahir)->translatedFormat('d F Y') : '-' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Alamat</p>
+                                <p class="font-semibold text-red-900">{{ $letter->memberPria->alamat }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-50 p-4 rounded-lg border-2 border-red-300">
+                        <h3 class="font-bold text-red-900 mb-3">👩 Mempelai Wanita</h3>
+                        <div class="space-y-2 text-sm">
+                            <div>
+                                <p class="text-gray-500">Nama</p>
+                                <p class="font-semibold text-red-900">{{ $letter->memberWanita->nama_lengkap }}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">No. Identitas</p>
+                                <p class="font-semibold text-red-900">{{ $letter->memberWanita->no_identitas }}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Tempat Lahir</p>
+                                <p class="font-semibold text-red-900">{{ $letter->memberWanita->tempat_lahir }}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Tanggal Lahir</p>
+                                <p class="font-semibold text-red-900">{{ $letter->memberWanita->tanggal_lahir ? \Carbon\Carbon::parse($letter->memberWanita->tanggal_lahir)->translatedFormat('d F Y') : '-' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Alamat</p>
+                                <p class="font-semibold text-red-900">{{ $letter->memberWanita->alamat }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-orange-50 p-4 rounded-lg border-2 border-orange-300">
+                    <p class="text-sm text-gray-500 mb-1">Tanggal Pernikahan Rencana</p>
+                    <p class="text-2xl font-bold text-orange-900">{{ $letter->tanggal_pernikahan ? \Carbon\Carbon::parse($letter->tanggal_pernikahan)->translatedFormat('d F Y') : '-' }}</p>
+                </div>
+            </div>
+        @endif
+
         <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200 text-sm text-blue-800">
             <p><strong>Catatan:</strong> Untuk melihat isi surat yang telah di-generate otomatis, silakan klik tombol <strong>"Cetak"</strong> atau <strong>"Download PDF"</strong> di atas.</p>
         </div>

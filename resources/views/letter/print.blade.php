@@ -2,176 +2,140 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $letter->tipe_surat }} - {{ $letter->nomor_surat }}</title>
     <style>
-        @page {
-            size: A4;
-            margin: 0;
+        @page { 
+            size: A4; 
+            margin: 0; /* Margin diatur di level .page untuk kontrol lebih baik */
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
         body {
             font-family: 'Times New Roman', Times, serif;
-            line-height: 1.5;
-            color: #000;
+            margin: 0;
+            padding: 0;
             background: #fff;
+            font-size: 11pt;
         }
-        .container {
+        .page {
             width: 210mm;
+            padding: 10mm 15mm;
+            margin: auto;
             min-height: 297mm;
-            margin: 0 auto;
-            padding: 20mm 25mm;
-            position: relative;
+            position: relative; /* Untuk footer tetap di bawah */
         }
-
-        .letterhead {
-            text-align: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+        .kop-table {
+            width: 100%;
+            border-bottom: 2pt solid #000;
+            margin-bottom: 5mm;
+            padding-bottom: 2mm;
         }
         .kop-image {
-            width: 100%;
-            max-height: 140px;
-            object-fit: contain;
+            max-width: 180mm;
+            max-height: 30mm;
+            display: block;
+            margin: 0 auto;
         }
+        .kop-text { text-align: center; }
+        .line1 { font-size: 12pt; font-weight: bold; }
+        .line2 { font-size: 14pt; font-weight: bold; }
+        .line3 { font-size: 12pt; }
 
-        .title-section {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .title {
-            font-size: 14pt;
-            font-weight: bold;
-            text-decoration: underline;
-            text-transform: uppercase;
-        }
-        .number {
-            font-size: 11pt;
-            margin-top: 5px;
-        }
+        .title-section { text-align: center; margin-bottom: 6mm; }
+        .title { font-size: 12pt; font-weight: bold; text-decoration: underline; text-transform: uppercase; }
+        .number { font-size: 11pt; margin-top: 1mm; }
 
         .content {
-            font-size: 12pt;
+            line-height: 1.4;
             text-align: justify;
-        }
-        .opening-text {
-            margin-bottom: 15px;
         }
         
         .data-table {
             width: 100%;
-            margin: 20px 0 20px 40px;
+            margin-left: 10mm;
+            margin-bottom: 3mm;
             border-collapse: collapse;
         }
-        .data-table td {
-            padding: 5px 0;
-            vertical-align: top;
-        }
-        .label { width: 160px; }
-        .colon { width: 20px; }
+        .data-table td { padding: 0.5mm 0; vertical-align: top; }
+        .label { width: 45mm; }
+        .colon { width: 5mm; }
 
-        .closing-text {
-            margin-top: 15px;
-            line-height: 1.8;
-        }
+        .body-content { margin-top: 2mm; }
 
-        .signature-section {
-            margin-top: 50px;
+        .sig-table {
             width: 100%;
+            margin-top: 8mm; /* Jarak 2 enter dari isi surat */
         }
-        .signature-table {
-            width: 100%;
+        .sig-right {
+            width: 50%;
+            text-align: center;
         }
-        .sig-space {
-            height: 100px;
-        }
-        .sig-name {
-            font-weight: bold;
-            text-decoration: underline;
-        }
+        .sig-name { font-weight: bold; text-decoration: underline; }
 
         .footer-system {
             position: absolute;
-            bottom: 15mm;
-            left: 0;
-            right: 0;
+            bottom: 10mm;
+            left: 15mm;
+            right: 15mm;
             text-align: center;
-            font-size: 9pt;
+            font-size: 8pt;
             color: #666;
             font-style: italic;
+            border-top: 0.5pt solid #ccc;
+            padding-top: 2mm;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="letterhead">
-            @if(file_exists(public_path('images/kop-surat.jpg')))
-                <img src="{{ asset('images/kop-surat.jpg') }}" alt="Kop Surat" class="kop-image">
-            @else
-                <div style="font-size: 14pt; font-weight: bold;">GEREJA PENTEKOSTA DI INDONESIA</div>
-                <div style="font-size: 16pt; font-weight: bold;">Jemaat "SAHABAT ALLAH" Palembang</div>
-                <div style="font-size: 9pt;">JL. Sejahtera Lr. Sahabat, Sukabangun II Kel. Sukajaya Kec. Sukarami Palembang</div>
-            @endif
-        </div>
+    <div class="page">
+        <table class="kop-table">
+            <tr>
+                <td class="kop-text">
+                    @php $kopPath = public_path('images/kop-surat.jpg'); @endphp
+                    @if(file_exists($kopPath))
+                        <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents($kopPath)) }}" class="kop-image">
+                    @else
+                        <div class="line1">GEREJA PENTEKOSTA DI INDONESIA</div>
+                        <div class="line2">Jemaat "SAHABAT ALLAH" Palembang</div>
+                        <div class="line3">JL. Sejahtera Lr. Sahabat, Sukabangun II Kel. Sukajaya Kec. Sukarami, Palembang 30152</div>
+                    @endif
+                </td>
+            </tr>
+        </table>
 
         <div class="title-section">
-            <h1 class="title">{{ $letter->tipe_surat }}</h1>
-            <p class="number">No. {{ $letter->nomor_surat }}</p>
+            <div class="title">{{ $letter->tipe_surat }}</div>
+            <div class="number">No. {{ $letter->nomor_surat }}</div>
         </div>
 
         <div class="content">
             @if($letter->member)
-                <p class="opening-text">{{ \App\Services\LetterTemplateService::getLetterOpeningText($letter->letter_type) }}</p>
-
+                <div style="margin-bottom: 2mm;">{{ \App\Services\LetterTemplateService::getLetterOpeningText($letter->letter_type) }}</div>
                 <table class="data-table">
                     <tr>
                         <td class="label">Nama</td>
                         <td class="colon">:</td>
-                        <td style="font-weight: bold;">{{ $letter->member->nama_lengkap ?? '-' }}</td>
+                        <td style="font-weight: bold;">{{ $letter->member->nama_lengkap }}</td>
                     </tr>
-                    <tr>
-                        <td class="label">No. Telepon</td>
-                        <td class="colon">:</td>
-                        <td>{{ $letter->member->no_telepon ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <td class="label">Tempat/Tanggal Lahir</td>
-                        <td class="colon">:</td>
-                        <td>
-                            {{ $letter->member->tempat_lahir ?? '-' }}, 
-                            {{ $letter->member->tanggal_lahir ? \Carbon\Carbon::parse($letter->member->tanggal_lahir)->translatedFormat('d F Y') : '-' }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label">Alamat</td>
-                        <td class="colon">:</td>
-                        <td>{{ $letter->member->alamat ?? '-' }}</td>
-                    </tr>
+                    <tr><td class="label">No. Telepon</td><td class="colon">:</td><td>{{ $letter->member->no_telepon }}</td></tr>
+                    <tr><td class="label">Tempat/Tgl Lahir</td><td class="colon">:</td><td>{{ $letter->member->tempat_lahir }}, {{ \Carbon\Carbon::parse($letter->member->tanggal_lahir)->translatedFormat('d F Y') }}</td></tr>
+                    <tr><td class="label">Alamat</td><td class="colon">:</td><td>{{ $letter->member->alamat }}</td></tr>
                 </table>
             @endif
 
-            <div class="closing-text">
-                {!! nl2br(\App\Services\LetterTemplateService::generateLetterBody($letter->letter_type, $letter)) !!}
+            <div class="body-content">
+                {!! \App\Services\LetterTemplateService::generateLetterBody($letter->letter_type, $letter) !!}
             </div>
         </div>
 
-        <div class="signature-section">
-            <table class="signature-table">
-                <tr>
-                    <td style="width: 60%;"></td>
-                    <td style="text-align: center;">
-                        Palembang, {{ $letter->tanggal_surat ? \Carbon\Carbon::parse($letter->tanggal_surat)->translatedFormat('d F Y') : '-' }}<br>
-                        <strong>Gembala Sidang</strong>
-                        <div class="sig-space"></div>
-                        <div class="sig-name">( Tamrin Gultom, S.Th. )</div>
-                    </td>
-                </tr>
-            </table>
-        </div>
+        <table class="sig-table">
+            <tr>
+                <td style="width: 50%;"></td>
+                <td class="sig-right">
+                    <div style="margin-bottom: 1mm;">Palembang, {{ \Carbon\Carbon::parse($letter->tanggal_surat)->translatedFormat('d F Y') }}</div>
+                    <div style="font-weight: bold; margin-bottom: 15mm;">Gembala Sidang</div>
+                    <div class="sig-name">( Tamrin Gultom, S.Th. )</div>
+                </td>
+            </tr>
+        </table>
 
         <div class="footer-system">
             Dokumen ini dicetak otomatis dari Sistem Sekretariat Gereja Pantekosta Jemaat Sahabat Allah Palembang
