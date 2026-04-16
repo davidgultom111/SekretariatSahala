@@ -11,7 +11,22 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <!-- Search Bar -->
+    <div class="mb-6">
+        <form method="GET" action="{{ route('member.index') }}" class="flex gap-2">
+            <input type="text" name="search" placeholder="Cari nama jemaat..." 
+                   value="{{ $search ?? '' }}"
+                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
+                Cari
+            </button>
+            @if($search)
+                <a href="{{ route('member.index') }}" class="px-6 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition font-semibold">
+                    Reset
+                </a>
+            @endif
+        </form>
+    </div>
         <table class="w-full">
             <thead class="bg-blue-900 text-white">
                 <tr>
@@ -50,7 +65,13 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada data jemaat</td>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                            @if($search)
+                                Tidak ada hasil pencarian untuk "<strong>{{ $search }}</strong>"
+                            @else
+                                Belum ada data jemaat
+                            @endif
+                        </td>
                     </tr>
                 @endforelse
             </tbody>

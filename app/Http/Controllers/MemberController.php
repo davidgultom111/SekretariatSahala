@@ -7,10 +7,19 @@ use Illuminate\Http\Request;
 
 class MemberController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $members = Member::orderBy('nama_lengkap', 'asc')->paginate(10);
-        return view('member.index', compact('members'));
+        $search = $request->query('search');
+        
+        $query = Member::orderBy('nama_lengkap', 'asc');
+        
+        if ($search) {
+            $query->where('nama_lengkap', 'like', '%' . $search . '%');
+        }
+        
+        $members = $query->paginate(10);
+        
+        return view('member.index', compact('members', 'search'));
     }
 
     public function create()
