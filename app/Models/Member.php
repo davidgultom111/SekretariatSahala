@@ -30,4 +30,20 @@ class Member extends Model
     {
         return $this->hasMany(Letter::class);
     }
+
+    /**
+     * Get the marriage letters where member is pria.
+     */
+    public function marriageLettersAsPria()
+    {
+        return $this->hasMany(Letter::class, 'member_pria_id');
+    }
+
+    /**
+     * Get the marriage letters where member is wanita.
+     */
+    public function marriageLettersAsWanita()
+    {
+        return $this->hasMany(Letter::class, 'member_wanita_id');
+    }
 }

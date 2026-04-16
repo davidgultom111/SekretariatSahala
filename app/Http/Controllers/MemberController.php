@@ -9,7 +9,7 @@ class MemberController extends Controller
 {
     public function index()
     {
-        $members = Member::paginate(10);
+        $members = Member::orderBy('nama_lengkap', 'asc')->paginate(10);
         return view('member.index', compact('members'));
     }
 
@@ -64,7 +64,19 @@ class MemberController extends Controller
 
     public function destroy(Member $member)
     {
+        // Check for related letters BEFORE deletion to inform user
+        $letterCount = $member->letters()->count();
+        $marriageLettersCount = $member->marriageLettersAsPria()->count() + $member->marriageLettersAsWanita()->count();
+        $totalRelated = $letterCount + $marriageLettersCount;
+        
+        // Delete member (cascade will delete related letters automatically)
         $member->delete();
-        return redirect()->route('member.index')->with('success', 'Data jemaat berhasil dihapus');
+        
+        $message = 'Data jemaat berhasil dihapus';
+        if ($totalRelated > 0) {
+            $message .= " (beserta {$totalRelated} surat terkait)";
+        }
+        
+        return redirect()->route('member.index')->with('success', $message);
     }
 }
