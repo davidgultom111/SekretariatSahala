@@ -13,7 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            // EnsureFrontendRequestsAreStateful dihapus — API ini pakai Bearer token,
+            // bukan session cookie, sehingga CSRF check tidak diperlukan.
         ]);
 
         $middleware->alias([

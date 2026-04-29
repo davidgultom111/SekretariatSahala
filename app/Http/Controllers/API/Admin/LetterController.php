@@ -94,13 +94,23 @@ class LetterController extends BaseController
             return response()->download($path, $filename);
         }
 
-        // Generate on-the-fly if not stored
-        $filename = 'surat_' . str_replace('/', '-', $letter->nomor_surat) . '.pdf';
+        // Generate, simpan ke disk, update pdf_path agar has_pdf = true
+        $filename    = 'surat_' . str_replace('/', '-', $letter->nomor_surat) . '.pdf';
+        $storagePath = 'letters/' . $filename;
+        $fullPath    = storage_path('app/' . $storagePath);
+
+        if (!is_dir(dirname($fullPath))) {
+            mkdir(dirname($fullPath), 0755, true);
+        }
+
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
             'letter.print',
             ['letter' => $letter->load(['member', 'memberPria', 'memberWanita'])]
         )->setPaper('A4', 'portrait');
 
-        return $pdf->download($filename);
+        $pdf->save($fullPath);
+        $letter->update(['pdf_path' => $storagePath]);
+
+        return response()->download($fullPath, $filename);
     }
 }
