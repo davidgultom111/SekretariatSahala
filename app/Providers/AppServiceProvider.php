@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Member;
+use App\Observers\MemberObserver;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Http\Middleware\HandleCors;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register MemberObserver to auto-generate id_jemaat
+        Member::observe(MemberObserver::class);
     }
 }
+
+
