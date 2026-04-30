@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        @page { 
-            size: A4; 
-            margin: 0; /* Margin diatur di level .page untuk kontrol lebih baik */
+        @page {
+            size: A4;
+            margin: 10mm 15mm;
         }
         * { box-sizing: border-box; }
         body {
@@ -15,13 +15,6 @@
             background: #fff;
             font-size: 11pt;
         }
-        .page {
-            width: 210mm;
-            padding: 10mm 15mm;
-            margin: auto;
-            min-height: 297mm;
-            position: relative; /* Untuk footer tetap di bawah */
-        }
         .kop-table {
             width: 100%;
             border-bottom: 2pt solid #000;
@@ -29,7 +22,7 @@
             padding-bottom: 2mm;
         }
         .kop-image {
-            max-width: 180mm;
+            max-width: 100%;
             max-height: 30mm;
             display: block;
             margin: 0 auto;
@@ -47,7 +40,7 @@
             line-height: 1.4;
             text-align: justify;
         }
-        
+
         .data-table {
             width: 100%;
             margin-left: 10mm;
@@ -62,7 +55,8 @@
 
         .sig-table {
             width: 100%;
-            margin-top: 8mm; /* Jarak 2 enter dari isi surat */
+            margin-top: 8mm;
+            border-collapse: collapse;
         }
         .sig-right {
             width: 50%;
@@ -71,10 +65,7 @@
         .sig-name { font-weight: bold; text-decoration: underline; }
 
         .footer-system {
-            position: absolute;
-            bottom: 10mm;
-            left: 15mm;
-            right: 15mm;
+            margin-top: 8mm;
             text-align: center;
             font-size: 8pt;
             color: #666;
@@ -85,7 +76,7 @@
     </style>
 </head>
 <body>
-    <div class="page">
+    <div>
         <table class="kop-table">
             <tr>
                 <td class="kop-text">
