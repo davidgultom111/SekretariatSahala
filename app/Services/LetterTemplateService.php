@@ -6,27 +6,28 @@ use App\Models\Member;
 use App\Models\LetterNumberCounter;
 use Carbon\Carbon;
 
+// LetterTemplateService menangani logika nomor surat dan konten HTML isi surat
 class LetterTemplateService
 {
+    // Identitas organisasi yang dipakai di nomor surat
     const ORGANIZATION = 'GPdI';
-    const CHURCH = 'SA';
+    const CHURCH       = 'SA';
 
+    // API menangani daftar semua tipe surat yang tersedia (slug => nama tampilan)
     public static function getLetterTypes()
     {
         return [
-            'surat_tugas_pelayanan' => 'Surat Tugas Pelayanan',
-            'surat_pengantar' => 'Surat Pengantar',
-            'surat_keterangan_jemaat_aktif' => 'Surat Keterangan Jemaat Aktif',
-            'surat_nilai_sekolah' => 'Surat Nilai Sekolah',
-            'surat_pengajuan_baptisan' => 'Surat Pengajuan Baptisan',
+            'surat_tugas_pelayanan'           => 'Surat Tugas Pelayanan',
+            'surat_pengantar'                 => 'Surat Pengantar',
+            'surat_keterangan_jemaat_aktif'   => 'Surat Keterangan Jemaat Aktif',
+            'surat_nilai_sekolah'             => 'Surat Nilai Sekolah',
+            'surat_pengajuan_baptisan'        => 'Surat Pengajuan Baptisan',
             'surat_pengajuan_penyerahan_anak' => 'Surat Pengajuan Penyerahan Anak',
-            'surat_pengajuan_pernikahan' => 'Surat Pengajuan Pernikahan',
+            'surat_pengajuan_pernikahan'      => 'Surat Pengajuan Pernikahan',
         ];
     }
 
-    /**
-     * Helper Tabel Identitas untuk hasil PDF yang presisi
-     */
+    // API menangani render tabel identitas HTML untuk isi PDF surat
     private static function renderIdentityTable($rows)
     {
         $html = '<table style="width: 100%; border-collapse: collapse; margin-bottom: 2mm;">';
@@ -41,25 +42,31 @@ class LetterTemplateService
         return $html;
     }
 
+    // API menangani generate nomor surat otomatis dan increment counter
     public static function generateLetterNumber($letterType)
     {
         $currentYear = now()->year;
+
+        // Ambil atau buat counter untuk tipe surat dan tahun ini
         $counter = LetterNumberCounter::firstOrCreate(
             ['letter_type' => $letterType, 'year' => $currentYear],
             ['next_number' => 1, 'abbreviation' => self::getAbbreviationForLetterType($letterType)]
         );
 
-        $number = str_pad($counter->next_number, 3, '0', STR_PAD_LEFT);
+        // Format nomor dengan padding 3 digit, misal: 001/GPdI/SA/SP/2026
+        $number       = str_pad($counter->next_number, 3, '0', STR_PAD_LEFT);
         $letterNumber = "{$number}/" . self::ORGANIZATION . "/" . self::CHURCH . "/{$counter->abbreviation}/{$currentYear}";
-        
+
+        // Increment counter untuk nomor surat berikutnya
         $counter->increment('next_number');
         return $letterNumber;
     }
 
+    // API menangani preview nomor surat tanpa increment counter (hanya tampilan)
     public static function getLetterNumberPreview($letterType)
     {
         $currentYear = now()->year;
-        $counter = LetterNumberCounter::firstOrCreate(
+        $counter     = LetterNumberCounter::firstOrCreate(
             ['letter_type' => $letterType, 'year' => $currentYear],
             ['next_number' => 1, 'abbreviation' => self::getAbbreviationForLetterType($letterType)]
         );
@@ -68,95 +75,118 @@ class LetterTemplateService
         return "{$number}/" . self::ORGANIZATION . "/" . self::CHURCH . "/{$counter->abbreviation}/{$currentYear}";
     }
 
+    // API menangani pemetaan slug tipe surat ke singkatan untuk nomor surat
     private static function getAbbreviationForLetterType($letterType)
     {
         return match ($letterType) {
-            'surat_tugas_pelayanan' => 'TP',
-            'surat_pengantar' => 'SP',
-            'surat_keterangan_jemaat_aktif' => 'KJA',
-            'surat_nilai_sekolah' => 'NS',
-            'surat_pengajuan_baptisan' => 'PB',
+            'surat_tugas_pelayanan'           => 'TP',
+            'surat_pengantar'                 => 'SP',
+            'surat_keterangan_jemaat_aktif'   => 'KJA',
+            'surat_nilai_sekolah'             => 'NS',
+            'surat_pengajuan_baptisan'        => 'PB',
             'surat_pengajuan_penyerahan_anak' => 'PA',
-            'surat_pengajuan_pernikahan' => 'PP',
-            default => 'XX',
+            'surat_pengajuan_pernikahan'      => 'PP',
+            default                           => 'XX',
         };
     }
 
+    // API menangani teks pembuka surat yang berbeda per tipe surat
     public static function getLetterOpeningText($type)
     {
         return match ($type) {
-            'surat_pengantar' => 'Dengan hormat, kami memberitahukan bahwa:',
-            'surat_nilai_sekolah' => 'Yang bertanda tangan di bawah ini adalah Gembala Sidang Jemaat yang menerangkan bahwa:',
-            'surat_pengajuan_baptisan', 'surat_pengajuan_penyerahan_anak', 'surat_pengajuan_pernikahan' => 'Kepada Yth. Pemimpin Ibadah terkait di tempat,',
-            default => 'Yang bertanda tangan di bawah ini menerangkan bahwa:',
+            'surat_pengantar'
+                => 'Dengan hormat, kami memberitahukan bahwa:',
+            'surat_nilai_sekolah'
+                => 'Yang bertanda tangan di bawah ini adalah Gembala Sidang Jemaat yang menerangkan bahwa:',
+            'surat_pengajuan_baptisan', 'surat_pengajuan_penyerahan_anak', 'surat_pengajuan_pernikahan'
+                => 'Kepada Yth. Pemimpin Ibadah terkait di tempat,',
+            default
+                => 'Yang bertanda tangan di bawah ini menerangkan bahwa:',
         };
     }
 
+    // API menangani generate konten HTML isi surat sesuai tipe yang dipilih
     public static function generateLetterBody($type, $letter)
     {
-        // Pastikan $letter adalah instance model Letter
+        // Pastikan $letter adalah instance model Letter yang valid
         if (!$letter || class_basename($letter) !== 'Letter') return "";
 
         switch ($type) {
+
+            // API menangani isi surat tugas pelayanan dengan tanggal dan tujuan tugas
             case 'surat_tugas_pelayanan':
-                $tglMulai = $letter->tgl_mulai_tugas ? Carbon::parse($letter->tgl_mulai_tugas)->translatedFormat('d F Y') : '-';
-                $tglAkhir = $letter->tgl_akhir_tugas ? Carbon::parse($letter->tgl_akhir_tugas)->translatedFormat('d F Y') : '-';
-                
+                $tglMulai = $letter->tgl_mulai_tugas
+                    ? Carbon::parse($letter->tgl_mulai_tugas)->translatedFormat('d F Y') : '-';
+                $tglAkhir = $letter->tgl_akhir_tugas
+                    ? Carbon::parse($letter->tgl_akhir_tugas)->translatedFormat('d F Y') : '-';
+
                 $data = [
                     'Tanggal Mulai' => $tglMulai,
                     'Tanggal Akhir' => $tglAkhir,
-                    'Tujuan Tugas' => $letter->tujuan_tugas
+                    'Tujuan Tugas'  => $letter->tujuan_tugas,
                 ];
-                
-                return "<p style='margin-bottom: 2mm;'>Telah ditugaskan untuk melakukan pelayanan dengan perincian sebagai berikut:</p>" . 
-                       self::renderIdentityTable($data) .
-                       "<p style='margin-top: 2mm;'>Semoga dapat melayani dengan sepenuh hati kepada Tuhan dan sesama.</p>";
 
+                return "<p style='margin-bottom: 2mm;'>Telah ditugaskan untuk melakukan pelayanan dengan perincian sebagai berikut:</p>"
+                    . self::renderIdentityTable($data)
+                    . "<p style='margin-top: 2mm;'>Semoga dapat melayani dengan sepenuh hati kepada Tuhan dan sesama.</p>";
+
+            // API menangani isi surat pengantar dengan keterangan keperluan
             case 'surat_pengantar':
-                return "<p>Adalah anggota jemaat Gereja Pantekosta di Indonesia Jemaat Sahabat Allah dan terdaftar dalam daftar anggota kami.</p>" .
-                       "<p style='margin-top: 3mm;'>Adapun surat pengantar ini diberikan untuk keperluan: <strong>{$letter->keterangan}</strong></p>" .
-                       "<p style='margin-top: 3mm;'>Demikian surat pengantar ini dibuat agar dapat dipergunakan sebagaimana mestinya.</p>";
+                return "<p>Adalah anggota jemaat Gereja Pantekosta di Indonesia Jemaat Sahabat Allah dan terdaftar dalam daftar anggota kami.</p>"
+                    . "<p style='margin-top: 3mm;'>Adapun surat pengantar ini diberikan untuk keperluan: <strong>{$letter->keterangan}</strong></p>"
+                    . "<p style='margin-top: 3mm;'>Demikian surat pengantar ini dibuat agar dapat dipergunakan sebagaimana mestinya.</p>";
 
+            // API menangani isi surat keterangan jemaat aktif dengan tahun bergabung
             case 'surat_keterangan_jemaat_aktif':
-                return "<p>Adalah benar anggota jemaat Gereja Pantekosta di Indonesia Jemaat Sahabat Allah Palembang yang aktif dan terdaftar dalam keikutsertaan agenda ibadah jemaat sejak tahun <strong>{$letter->tahun_bergabung}</strong>.</p>" .
-                       "<p style='margin-top: 4mm;'>Demikian surat keterangan ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.</p>";
+                return "<p>Adalah benar anggota jemaat Gereja Pantekosta di Indonesia Jemaat Sahabat Allah Palembang yang aktif dan terdaftar dalam keikutsertaan agenda ibadah jemaat sejak tahun <strong>{$letter->tahun_bergabung}</strong>.</p>"
+                    . "<p style='margin-top: 4mm;'>Demikian surat keterangan ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.</p>";
 
+            // API menangani isi surat nilai sekolah dengan data sekolah dan nilai
             case 'surat_nilai_sekolah':
                 $data = [
-                    'Asal Sekolah' => $letter->asal_sekolah,
+                    'Asal Sekolah'  => $letter->asal_sekolah,
                     'Kelas/Tingkat' => $letter->kelas ?? '-',
-                    'Semester' => $letter->semester ?? '-',
+                    'Semester'      => $letter->semester ?? '-',
                 ];
                 $nilai = $letter->nilai ?? 90;
 
-                return self::renderIdentityTable($data) .
-                       "<p style='margin-top: 3mm;'>Siswa/siswi tersebut telah mengikuti kegiatan ibadah dan pembelajaran agama di GPdI Jemaat Sahabat Allah Palembang dengan nilai:</p>" .
-                       "<div style='text-align: center; font-size: 14pt; font-weight: bold; margin-top: 4mm;'>[ {$nilai} ]</div>";
+                return self::renderIdentityTable($data)
+                    . "<p style='margin-top: 3mm;'>Siswa/siswi tersebut telah mengikuti kegiatan ibadah dan pembelajaran agama di GPdI Jemaat Sahabat Allah Palembang dengan nilai:</p>"
+                    . "<div style='text-align: center; font-size: 14pt; font-weight: bold; margin-top: 4mm;'>[ {$nilai} ]</div>";
 
+            // API menangani isi surat pengajuan penyerahan anak dengan data orang tua dan anak
             case 'surat_pengajuan_penyerahan_anak':
                 $data = [
-                    'Nama Ayah' => $letter->nama_ayah ?? '-',
-                    'Nama Ibu' => $letter->nama_ibu ?? '-',
-                    'Nama Anak' => $letter->nama_anak,
-                    'Tempat/Tgl Lahir' => ($letter->tempat_lahir_anak ?? '-') . " / " . ($letter->tanggal_lahir_anak ? Carbon::parse($letter->tanggal_lahir_anak)->translatedFormat('d F Y') : '-')
+                    'Nama Ayah'        => $letter->nama_ayah ?? '-',
+                    'Nama Ibu'         => $letter->nama_ibu ?? '-',
+                    'Nama Anak'        => $letter->nama_anak,
+                    'Tempat/Tgl Lahir' => ($letter->tempat_lahir_anak ?? '-') . " / "
+                        . ($letter->tanggal_lahir_anak
+                            ? Carbon::parse($letter->tanggal_lahir_anak)->translatedFormat('d F Y')
+                            : '-'),
                 ];
-                return self::renderIdentityTable($data) .
-                       "<p style='margin-top: 3mm;'>Orang tua dari anak tersebut ingin menyerahkan anak mereka kepada Tuhan dan memohon doa restu dalam ibadah penyerahan anak.</p>";
 
+                return self::renderIdentityTable($data)
+                    . "<p style='margin-top: 3mm;'>Orang tua dari anak tersebut ingin menyerahkan anak mereka kepada Tuhan dan memohon doa restu dalam ibadah penyerahan anak.</p>";
+
+            // API menangani isi surat pengajuan pernikahan dengan data kedua mempelai
             case 'surat_pengajuan_pernikahan':
-                $tglNikah = $letter->tanggal_pernikahan ? Carbon::parse($letter->tanggal_pernikahan)->translatedFormat('d F Y') : '-';
+                $tglNikah = $letter->tanggal_pernikahan
+                    ? Carbon::parse($letter->tanggal_pernikahan)->translatedFormat('d F Y') : '-';
                 $data = [
-                    'Mempelai Pria' => $letter->memberPria->nama_lengkap ?? '-',
+                    'Mempelai Pria'   => $letter->memberPria->nama_lengkap ?? '-',
                     'Mempelai Wanita' => $letter->memberWanita->nama_lengkap ?? '-',
-                    'Rencana Nikah' => $tglNikah,
-                    'Tempat' => 'GPdI Sahabat Allah Palembang'
+                    'Rencana Nikah'   => $tglNikah,
+                    'Tempat'          => 'GPdI Sahabat Allah Palembang',
                 ];
-                return "<p style='margin-bottom: 2mm;'>Calon mempelai telah siap untuk memasuki ikatan pernikahan kudus. Kami memohon agar proses bimbingan dan upacara pernikahan dapat dilaksanakan pada:</p>" .
-                       self::renderIdentityTable($data);
 
+                return "<p style='margin-bottom: 2mm;'>Calon mempelai telah siap untuk memasuki ikatan pernikahan kudus. Kami memohon agar proses bimbingan dan upacara pernikahan dapat dilaksanakan pada:</p>"
+                    . self::renderIdentityTable($data);
+
+            // API menangani isi surat pengajuan baptisan dengan keterangan komitmen
             case 'surat_pengajuan_baptisan':
-                return "<p>Jemaat tersebut telah menyatakan komitmennya menerima Yesus Kristus sebagai Tuhan dan Juru Selamat pribadi, dan rindu untuk dibaptis air sebagai tanda pernyataan imannya.</p>" .
-                       "<p style='margin-top: 3mm;'>Kami memohon agar calon baptis ini dapat disertakan pada upacara pembaptisan berikutnya.</p>";
+                return "<p>Jemaat tersebut telah menyatakan komitmennya menerima Yesus Kristus sebagai Tuhan dan Juru Selamat pribadi, dan rindu untuk dibaptis air sebagai tanda pernyataan imannya.</p>"
+                    . "<p style='margin-top: 3mm;'>Kami memohon agar calon baptis ini dapat disertakan pada upacara pembaptisan berikutnya.</p>";
 
             default:
                 return "";

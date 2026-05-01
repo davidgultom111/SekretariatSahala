@@ -4,30 +4,27 @@ namespace App\Http\Requests\API;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+// UpdateMemberBiodataRequest menangani validasi saat jemaat update biodata sendiri
 class UpdateMemberBiodataRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
+    // Jemaat yang sudah login diizinkan update biodatanya sendiri
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
+    // API menangani validasi field biodata yang boleh diubah oleh jemaat (bukan admin)
     public function rules(): array
     {
         return [
+            // Field 'sometimes' berarti opsional — hanya divalidasi jika dikirim
             'nama_lengkap' => 'sometimes|string|max:255',
             'alamat'       => 'sometimes|string|max:500',
             'no_telepon'   => 'sometimes|string|max:20',
         ];
     }
 
+    // Pesan error dalam Bahasa Indonesia
     public function messages(): array
     {
         return [

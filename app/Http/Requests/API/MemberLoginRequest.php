@@ -4,34 +4,30 @@ namespace App\Http\Requests\API;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+// MemberLoginRequest menangani validasi input saat jemaat melakukan login
 class MemberLoginRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
+    // Semua jemaat diizinkan mengakses endpoint login (publik)
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
+    // API menangani validasi field id_jemaat dan password wajib diisi
     public function rules(): array
     {
         return [
             'id_jemaat' => 'required|string',
-            'password' => 'required|string',
+            'password'  => 'required|string',
         ];
     }
 
+    // Pesan error dalam Bahasa Indonesia
     public function messages(): array
     {
         return [
             'id_jemaat.required' => 'ID Jemaat harus diisi',
-            'password.required' => 'Password harus diisi',
+            'password.required'  => 'Password harus diisi',
         ];
     }
 }
