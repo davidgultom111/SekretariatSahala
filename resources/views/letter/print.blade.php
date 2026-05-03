@@ -11,7 +11,7 @@
         body {
             font-family: 'Times New Roman', Times, serif;
             margin: 0;
-            padding: 0;
+            padding: 0 0 12mm 0;
             background: #fff;
             font-size: 11pt;
         }
@@ -65,13 +65,18 @@
         .sig-name { font-weight: bold; text-decoration: underline; }
 
         .footer-system {
-            margin-top: 8mm;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
             text-align: center;
             font-size: 8pt;
             color: #666;
             font-style: italic;
             border-top: 0.5pt solid #ccc;
             padding-top: 2mm;
+            padding-bottom: 2mm;
         }
     </style>
 </head>

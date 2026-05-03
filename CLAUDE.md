@@ -19,10 +19,10 @@ php artisan queue:listen --tries=1
 # Start all dev servers (PHP + queue + Vite) concurrently
 composer run dev
 
-# Run tests
+# Run tests (uses Pest PHP 3.8)
 composer run test
 
-# Run a single test
+# Run a single test (Pest --filter matches test description strings)
 php artisan test --filter=TestName
 
 # Lint/format code
@@ -98,7 +98,7 @@ Seven types managed by `app/Services/LetterTemplateService.php`. Each type has d
 | `surat_pengajuan_penyerahan_anak` | PA | `member_id`, `nama_ayah`, `nama_ibu`, `nama_anak`, `tempat_lahir_anak`, `tanggal_lahir_anak` |
 | `surat_pengajuan_pernikahan` | PP | `member_pria_id`, `member_wanita_id`, `tanggal_pernikahan` (no `member_id`) |
 
-Letter numbers: `NNN/GPDI/SA/ABBREV/YEAR`. PDF export via DomPDF using `resources/views/letter/print.blade.php` (the only remaining Blade view).
+Letter numbers: `NNN/GPdI/SA/ABBREV/YEAR` (e.g. `001/GPdI/SA/SP/2026`). `generateLetterNumber()` increments the counter and commits; `getLetterNumberPreview()` shows the next value without committing. PDF export via DomPDF using `resources/views/letter/print.blade.php` (the only remaining Blade view). `LetterTemplateService` uses static methods — no constructor injection.
 
 ### API Layer
 
@@ -122,9 +122,10 @@ Form Requests: `app/Http/Requests/API/` and `Admin/` sub-namespace.
 ### Key Business Logic
 
 - **`MemberObserver`** (`app/Observers/MemberObserver.php`) auto-generates `id_jemaat` as `DDMMYYYY` from `tanggal_lahir` on create; appends a numeric counter on duplicate. Regenerates if `tanggal_lahir` changes on update. Registered in `AppServiceProvider`.
-- **Soft-delete cascade**: Deleting a member soft-deletes their letters (migration sets `ON DELETE CASCADE` on `letters.member_id`).
+- **Soft-delete cascade**: The `letters` table has a DB-level `ON DELETE CASCADE` on `member_id`, but since `Member` uses `SoftDeletes`, a normal admin delete only sets `deleted_at` and does not trigger the DB cascade. Letters belonging to a soft-deleted member are not automatically removed — handle this explicitly if needed.
 - **PDF download difference**: `GET /api/me/letters/{id}/download` only serves pre-stored PDFs; `GET /api/admin/letters/{id}/pdf` generates on-the-fly via DomPDF if no stored file exists.
-- **CORS**: `config/cors.php` is configured for API routes. Set `FRONTEND_URL` in `.env` to the Nuxt.js origin. Wildcard `*` is incompatible with `supports_credentials=true`.
+- **CORS**: `config/cors.php` is configured for API routes. Set `FRONTEND_URL` in `.env` to the Nuxt.js origin. Wildcard `*` is incompatible with `supports_credentials=true`. `Content-Disposition` is in `exposed_headers` so browsers can read the filename on PDF downloads.
+- **Queue**: Configured with the `database` driver (jobs stored in DB, not Redis). No `app/Jobs` classes exist yet — the queue listener is started for future use.
 - **Scramble** (`dedoc/scramble`) auto-generates OpenAPI docs at `/docs/api` — no manual spec maintenance needed.
 - **`role:admin` alias** registered in `bootstrap/app.php` → maps to `App\Http\Middleware\CheckRole`.
 - **Global exception handler** in `bootstrap/app.php` — `api/*` routes always return JSON for 401/403/404/422.
