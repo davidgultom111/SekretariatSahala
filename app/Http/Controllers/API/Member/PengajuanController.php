@@ -9,8 +9,10 @@ use App\Services\LetterTemplateService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+// PengajuanController menangani pengajuan surat oleh jemaat untuk diproses admin
 class PengajuanController extends BaseController
 {
+    // API menangani daftar riwayat pengajuan surat milik jemaat yang sedang login
     public function index(Request $request): JsonResponse
     {
         $pengajuans = PengajuanSurat::where('member_id', $request->user()->id)
@@ -20,6 +22,7 @@ class PengajuanController extends BaseController
         return $this->success($pengajuans);
     }
 
+    // API menangani kirim pengajuan surat baru dengan validasi field sesuai tipe surat
     public function store(Request $request): JsonResponse
     {
         $allTypes = LetterTemplateService::getLetterTypes();

@@ -7,8 +7,10 @@ use App\Models\JadwalPelayanan;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+// JadwalController menangani CRUD jadwal pelayanan gereja oleh admin
 class JadwalController extends BaseController
 {
+    // API menangani daftar semua jadwal pelayanan diurutkan berdasarkan field urutan
     public function index(): JsonResponse
     {
         $jadwals = JadwalPelayanan::orderBy('urutan')->orderBy('id')->get();
@@ -16,6 +18,7 @@ class JadwalController extends BaseController
         return $this->success($jadwals);
     }
 
+    // API menangani tambah jadwal pelayanan baru dengan validasi field wajib
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -33,6 +36,7 @@ class JadwalController extends BaseController
         return $this->created($jadwal);
     }
 
+    // API menangani update jadwal pelayanan dengan partial update (semua field opsional)
     public function update(Request $request, JadwalPelayanan $jadwal): JsonResponse
     {
         $validated = $request->validate([
@@ -50,6 +54,7 @@ class JadwalController extends BaseController
         return $this->success($jadwal->fresh());
     }
 
+    // API menangani hapus jadwal pelayanan dari database
     public function destroy(JadwalPelayanan $jadwal): JsonResponse
     {
         $jadwal->delete();

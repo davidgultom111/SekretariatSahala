@@ -7,8 +7,10 @@ use App\Models\Pengumuman;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+// PengumumanController menangani CRUD pengumuman gereja oleh admin
 class PengumumanController extends BaseController
 {
+    // API menangani daftar semua pengumuman (aktif maupun tidak) diurutkan dari terbaru
     public function index(): JsonResponse
     {
         $pengumuman = Pengumuman::orderByDesc('tanggal_mulai')->orderByDesc('id')->get();
@@ -16,6 +18,7 @@ class PengumumanController extends BaseController
         return $this->success($pengumuman);
     }
 
+    // API menangani buat pengumuman baru dengan validasi rentang tanggal berlaku
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -31,6 +34,7 @@ class PengumumanController extends BaseController
         return $this->created($pengumuman);
     }
 
+    // API menangani update pengumuman dengan partial update (semua field opsional)
     public function update(Request $request, Pengumuman $pengumuman): JsonResponse
     {
         $validated = $request->validate([
@@ -46,6 +50,7 @@ class PengumumanController extends BaseController
         return $this->success($pengumuman->fresh());
     }
 
+    // API menangani hapus pengumuman dari database
     public function destroy(Pengumuman $pengumuman): JsonResponse
     {
         $pengumuman->delete();

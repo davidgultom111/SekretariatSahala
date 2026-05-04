@@ -8,8 +8,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+// GaleriController menangani upload dan hapus foto galeri gereja oleh admin
 class GaleriController extends BaseController
 {
+    // API menangani daftar semua foto galeri diurutkan berdasarkan field urutan
     public function index(): JsonResponse
     {
         $galeri = GaleriFoto::orderBy('urutan')->orderBy('id')->get();
@@ -17,6 +19,7 @@ class GaleriController extends BaseController
         return $this->success($galeri);
     }
 
+    // API menangani upload foto baru ke storage publik dengan validasi format dan ukuran file
     public function store(Request $request): JsonResponse
     {
         $request->validate([
@@ -26,6 +29,7 @@ class GaleriController extends BaseController
             'urutan'   => 'nullable|integer|min:0',
         ]);
 
+        // Simpan file foto ke disk public dan catat path-nya di database
         $path = $request->file('foto')->store('galeri', 'public');
 
         $galeri = GaleriFoto::create([
@@ -38,6 +42,7 @@ class GaleriController extends BaseController
         return $this->created($galeri);
     }
 
+    // API menangani hapus foto galeri beserta file fisiknya dari storage publik
     public function destroy(GaleriFoto $galeri): JsonResponse
     {
         Storage::disk('public')->delete($galeri->foto);

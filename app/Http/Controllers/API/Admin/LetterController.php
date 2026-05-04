@@ -20,12 +20,12 @@ class LetterController extends BaseController
     {
         $letters = Letter::with('member')
             ->when($request->query('search'), fn ($q, $s) =>
-                // Cari berdasarkan nama jemaat atau nomor surat
-                $q->whereHas('member', fn ($mq) =>
-                    $mq->where('nama_lengkap', 'LIKE', "%{$s}%")
-                )->orWhere('nomor_surat', 'LIKE', "%{$s}%")
+                $q->where(fn ($sub) =>
+                    $sub->whereHas('member', fn ($mq) =>
+                        $mq->where('nama_lengkap', 'LIKE', "%{$s}%")
+                    )->orWhere('nomor_surat', 'LIKE', "%{$s}%")
+                )
             )
-            // Filter berdasarkan tipe surat jika parameter letter_type dikirim
             ->when($request->query('letter_type'), fn ($q, $t) => $q->where('letter_type', $t))
             ->orderByDesc('created_at')
             ->paginate($request->query('per_page', 15));

@@ -10,8 +10,10 @@ use App\Services\LetterTemplateService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+// PengajuanController menangani review, persetujuan, dan penolakan pengajuan surat dari jemaat oleh admin
 class PengajuanController extends BaseController
 {
+    // API menangani daftar semua pengajuan surat dengan filter status (Dalam Proses / Disetujui / Ditolak)
     public function index(Request $request): JsonResponse
     {
         $pengajuans = PengajuanSurat::with(['member'])
@@ -22,6 +24,7 @@ class PengajuanController extends BaseController
         return $this->success($pengajuans);
     }
 
+    // API menangani tampil detail pengajuan beserta data member, mempelai, dan surat terkait
     public function show(PengajuanSurat $pengajuan): JsonResponse
     {
         return $this->success(
@@ -29,6 +32,7 @@ class PengajuanController extends BaseController
         );
     }
 
+    // API menangani persetujuan pengajuan surat — generate nomor surat dan buat record Letter baru
     public function approve(Request $request, PengajuanSurat $pengajuan): JsonResponse
     {
         if ($pengajuan->status !== 'Dalam Proses') {
@@ -41,9 +45,11 @@ class PengajuanController extends BaseController
         $nomorSurat   = LetterTemplateService::generateLetterNumber($pengajuan->letter_type);
         $tanggalSurat = $request->input('tanggal_surat', today()->toDateString());
 
+        // Surat pernikahan menggunakan member_pria_id sebagai member_id utama surat
         $isPernikahan = $pengajuan->letter_type === 'surat_pengajuan_pernikahan';
         $memberId     = $isPernikahan ? $pengajuan->member_pria_id : $pengajuan->member_id;
 
+        // Data dasar surat yang berlaku untuk semua tipe
         $letterData = [
             'member_id'     => $memberId,
             'tipe_surat'    => $allTypes[$pengajuan->letter_type],
@@ -53,6 +59,7 @@ class PengajuanController extends BaseController
             'keterangan'    => $pengajuan->keterangan,
         ];
 
+        // Field tambahan yang berbeda per tipe surat, disalin dari data pengajuan
         $typeFields = [
             'surat_tugas_pelayanan'           => ['tgl_mulai_tugas', 'tgl_akhir_tugas', 'tujuan_tugas'],
             'surat_keterangan_jemaat_aktif'   => ['tahun_bergabung'],
@@ -69,6 +76,7 @@ class PengajuanController extends BaseController
 
         $letter = Letter::create($letterData);
 
+        // Tandai pengajuan sebagai disetujui dan hubungkan ke surat yang baru dibuat
         $pengajuan->update(['status' => 'Disetujui', 'letter_id' => $letter->id]);
 
         return $this->success(
@@ -77,6 +85,7 @@ class PengajuanController extends BaseController
         );
     }
 
+    // API menangani penolakan pengajuan surat dengan catatan alasan dari admin
     public function reject(Request $request, PengajuanSurat $pengajuan): JsonResponse
     {
         if ($pengajuan->status !== 'Dalam Proses') {
@@ -91,6 +100,7 @@ class PengajuanController extends BaseController
         return $this->success(null, 'Pengajuan berhasil ditolak.');
     }
 
+    // API menangani hapus data pengajuan dari database
     public function destroy(PengajuanSurat $pengajuan): JsonResponse
     {
         $pengajuan->delete();
