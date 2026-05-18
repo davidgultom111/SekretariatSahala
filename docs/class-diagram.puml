@@ -1,0 +1,262 @@
+@startuml Class Diagram - Sekretariat Jemaat GPdI
+
+top to bottom direction
+skinparam backgroundColor #FFFFFF
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+skinparam class {
+  BackgroundColor #F8FAFC
+  BorderColor #475569
+  HeaderBackgroundColor #1E40AF
+  HeaderFontColor #FFFFFF
+  FontSize 11
+  AttributeFontSize 10
+}
+skinparam package {
+  BackgroundColor #F1F5F9
+  BorderColor #94A3B8
+  FontStyle bold
+  FontSize 12
+}
+
+title Class Diagram — Sistem Sekretariat Jemaat GPdI
+
+' =============================================
+' MODEL LAYER
+' =============================================
+package "Model Layer" {
+
+  class Member {
+    +id_jemaat : string
+    +nama_lengkap : string
+    +jenis_kelamin : string
+    +tanggal_lahir : date
+    +alamat : string
+    +no_telepon : string
+    +status_aktif : string
+    +role : string
+    -password : string
+    -deleted_at : timestamp
+    __
+    +letters() : HasMany
+    +pengajuans() : HasMany
+    +createToken() : Token
+  }
+
+  class Letter {
+    +id : int
+    +member_id : int
+    +tipe_surat : string
+    +letter_type : string
+    +nomor_surat : string
+    +tanggal_surat : date
+    +pdf_path : string
+    __
+    +member() : BelongsTo
+    +memberPria() : BelongsTo
+    +memberWanita() : BelongsTo
+  }
+
+  class PengajuanSurat {
+    +id : int
+    +member_id : int
+    +letter_type : string
+    +status : string
+    +catatan : string
+    +letter_id : int
+    __
+    +member() : BelongsTo
+    +letter() : BelongsTo
+  }
+
+  class LetterNumberCounter {
+    +letter_type : string
+    +year : int
+    +next_number : int
+    +abbreviation : string
+  }
+
+  class JadwalPelayanan {
+    +nama_kegiatan : string
+    +hari : string
+    +waktu : string
+    +aktif : boolean
+  }
+
+  class GaleriFoto {
+    +judul : string
+    +foto : string
+    +urutan : int
+    __
+    +getFotoUrlAttribute() : string
+  }
+
+  class Pengumuman {
+    +judul : string
+    +isi : string
+    +tanggal_mulai : date
+    +tanggal_akhir : date
+    +aktif : boolean
+  }
+}
+
+' =============================================
+' SERVICE & SUPPORT LAYER
+' =============================================
+package "Service & Support Layer" {
+
+  class LetterTemplateService <<Service>> {
+    -{static} ORGANIZATION : string
+    -{static} CHURCH : string
+    __
+    +{static} getLetterTypes() : array
+    +{static} generateLetterNumber(type) : string
+    +{static} getLetterNumberPreview(type) : string
+    +{static} generateLetterBody(type, letter) : string
+    -{static} getAbbreviationForLetterType(type) : string
+  }
+
+  class MemberObserver <<Observer>> {
+    +creating(member) : void
+    +updating(member) : void
+  }
+
+  class CheckRole <<Middleware>> {
+    +handle(request, next, roles) : Response
+  }
+}
+
+' =============================================
+' CONTROLLER LAYER
+' =============================================
+package "Controller Layer" {
+
+  abstract class BaseController {
+    #success(data, message) : JsonResponse
+    #created(data, message) : JsonResponse
+    #noContent() : JsonResponse
+    #error(message, status) : JsonResponse
+  }
+
+  class MemberAuthController {
+    +login(request) : JsonResponse
+    +logout(request) : JsonResponse
+  }
+
+  class MemberApiController {
+    +show(request) : JsonResponse
+    +update(request) : JsonResponse
+    +letters(request) : JsonResponse
+    +downloadLetter(request, id) : Response
+  }
+
+  class MemberPengajuanController {
+    +index(request) : JsonResponse
+    +store(request) : JsonResponse
+  }
+
+  class AdminMemberController {
+    +index(request) : JsonResponse
+    +store(request) : JsonResponse
+    +show(member) : JsonResponse
+    +update(request, member) : JsonResponse
+    +destroy(member) : JsonResponse
+  }
+
+  class AdminLetterController {
+    +index(request) : JsonResponse
+    +store(request) : JsonResponse
+    +show(letter) : JsonResponse
+    +destroy(letter) : JsonResponse
+    +downloadPdf(letter) : Response
+  }
+
+  class AdminPengajuanController {
+    +index(request) : JsonResponse
+    +show(pengajuan) : JsonResponse
+    +approve(request, pengajuan) : JsonResponse
+    +reject(request, pengajuan) : JsonResponse
+    +destroy(pengajuan) : JsonResponse
+  }
+
+  class AdminJadwalController {
+    +index(request) : JsonResponse
+    +store(request) : JsonResponse
+    +update(request, jadwal) : JsonResponse
+    +destroy(jadwal) : JsonResponse
+  }
+
+  class AdminGaleriController {
+    +index(request) : JsonResponse
+    +store(request) : JsonResponse
+    +destroy(galeri) : JsonResponse
+  }
+
+  class AdminPengumumanController {
+    +index(request) : JsonResponse
+    +store(request) : JsonResponse
+    +update(request, pengumuman) : JsonResponse
+    +destroy(pengumuman) : JsonResponse
+  }
+
+  class PublicJadwalController {
+    +index(request) : JsonResponse
+  }
+
+  class PublicGaleriController {
+    +index(request) : JsonResponse
+  }
+
+  class PublicPengumumanController {
+    +index(request) : JsonResponse
+  }
+}
+
+' =============================================
+' RELASI — MODEL
+' =============================================
+Member "1" *-- "0..*" Letter : memiliki >
+Member "1" *-- "0..*" PengajuanSurat : mengajukan >
+PengajuanSurat "1" --> "0..1" Letter : menghasilkan >
+LetterTemplateService ..> LetterNumberCounter : <<uses>>
+MemberObserver ..> Member : <<observes>>
+
+' =============================================
+' RELASI — INHERITANCE CONTROLLER
+' =============================================
+BaseController <|-- MemberAuthController
+BaseController <|-- MemberApiController
+BaseController <|-- MemberPengajuanController
+BaseController <|-- AdminMemberController
+BaseController <|-- AdminLetterController
+BaseController <|-- AdminPengajuanController
+BaseController <|-- AdminJadwalController
+BaseController <|-- AdminGaleriController
+BaseController <|-- AdminPengumumanController
+BaseController <|-- PublicJadwalController
+BaseController <|-- PublicGaleriController
+BaseController <|-- PublicPengumumanController
+
+' =============================================
+' RELASI — CONTROLLER → SERVICE & MODEL
+' =============================================
+MemberAuthController      ..> Member               : <<uses>>
+MemberApiController       ..> Member               : <<uses>>
+MemberApiController       ..> Letter               : <<uses>>
+MemberPengajuanController ..> PengajuanSurat       : <<uses>>
+MemberPengajuanController ..> LetterTemplateService : <<uses>>
+AdminMemberController     ..> Member               : <<uses>>
+AdminLetterController     ..> Letter               : <<uses>>
+AdminLetterController     ..> LetterTemplateService : <<uses>>
+AdminPengajuanController  ..> PengajuanSurat       : <<uses>>
+AdminPengajuanController  ..> Letter               : <<uses>>
+AdminPengajuanController  ..> LetterTemplateService : <<uses>>
+AdminJadwalController     ..> JadwalPelayanan      : <<uses>>
+AdminGaleriController     ..> GaleriFoto           : <<uses>>
+AdminPengumumanController ..> Pengumuman           : <<uses>>
+PublicJadwalController    ..> JadwalPelayanan      : <<uses>>
+PublicGaleriController    ..> GaleriFoto           : <<uses>>
+PublicPengumumanController ..> Pengumuman          : <<uses>>
+
+@enduml
