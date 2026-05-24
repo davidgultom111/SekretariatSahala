@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 // Model Letter merepresentasikan surat gereja yang dibuat oleh admin
 class Letter extends Model
@@ -46,19 +47,19 @@ class Letter extends Model
     ];
 
     // Relasi: surat dimiliki oleh satu jemaat utama
-    public function member()
+    public function member(): BelongsTo
     {
         return $this->belongsTo(Member::class);
     }
 
     // Relasi: mempelai pria pada surat pernikahan
-    public function memberPria()
+    public function memberPria(): BelongsTo
     {
         return $this->belongsTo(Member::class, 'member_pria_id');
     }
 
     // Relasi: mempelai wanita pada surat pernikahan
-    public function memberWanita()
+    public function memberWanita(): BelongsTo
     {
         return $this->belongsTo(Member::class, 'member_wanita_id');
     }

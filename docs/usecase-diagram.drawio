@@ -1,0 +1,275 @@
+<mxfile host="app.diagrams.net" modified="2026-05-24T00:00:00.000Z" agent="Claude Code" version="24.0.0">
+  <diagram id="sekretariat-diagram" name="Sekretariat System">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="t1" value="Use Case Diagram — Sistem Sekretariat Jemaat GPdI" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="160" y="8" width="900" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- System Boundary -->
+        <mxCell id="sb1" value="Sistem Sekretariat Jemaat GPdI" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;strokeColor=#23445D;fillColor=#f8f8ff;fontColor=#23445D;fontStyle=1;fontSize=13;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="160" y="45" width="900" height="1010" as="geometry" />
+        </mxCell>
+
+        <!-- ===== ACTORS ===== -->
+        <mxCell id="a1" value="Admin" style="shape=mxgraph.uml.actor;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="25" y="480" width="50" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a2" value="Jemaat&#xa;(Member)" style="shape=mxgraph.uml.actor;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="340" width="50" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a3" value="Publik&#xa;(Tamu)" style="shape=mxgraph.uml.actor;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="830" width="50" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ===== SHARED USE CASES ===== -->
+        <mxCell id="uc01" value="Login" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f0f0f0;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="480" y="70" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc02" value="Logout" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f0f0f0;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="480" y="140" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===== ADMIN USE CASES ===== -->
+        <mxCell id="uc03" value="Kelola Data Jemaat" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="210" y="230" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc04" value="Kelola Surat" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="210" y="310" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc05" value="Generate &amp; Download PDF" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="210" y="390" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc06" value="Kelola Jadwal Pelayanan" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="210" y="470" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc07" value="Kelola Galeri Foto" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="210" y="550" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc08" value="Kelola Pengumuman" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="210" y="630" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc09" value="Lihat Semua Pengajuan" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="210" y="720" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc10" value="Setujui Pengajuan Surat" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="210" y="800" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc11" value="Tolak Pengajuan Surat" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="210" y="880" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===== MEMBER USE CASES ===== -->
+        <mxCell id="uc12" value="Lihat Profil Sendiri" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="720" y="230" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc13" value="Edit Profil Sendiri" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="720" y="310" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc14" value="Lihat Surat Sendiri" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="720" y="390" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc15" value="Download PDF Surat" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="720" y="470" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc16" value="Ajukan Permohonan Surat" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="720" y="550" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc17" value="Lihat Riwayat Pengajuan" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="720" y="630" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===== PUBLIC USE CASES ===== -->
+        <mxCell id="uc18" value="Lihat Jadwal Pelayanan" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="230" y="960" width="200" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc19" value="Lihat Galeri Foto" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="480" y="960" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc20" value="Lihat Pengumuman" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="710" y="960" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===== ASSOCIATIONS — Admin ===== -->
+        <mxCell id="e01" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc01" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e02" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc02" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e03" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc03" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e04" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc04" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e05" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc05" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e06" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc06" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e07" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc07" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e08" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc08" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e09" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc09" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e10" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc10" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e11" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc11" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ===== ASSOCIATIONS — Member ===== -->
+        <mxCell id="e12" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc01" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e13" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc02" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e14" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc12" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e15" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc13" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e16" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc14" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e17" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc15" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e18" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc16" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e19" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc17" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ===== ASSOCIATIONS — Publik ===== -->
+        <mxCell id="e20" style="edgeStyle=none;html=1;" edge="1" source="a3" target="uc18" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e21" style="edgeStyle=none;html=1;" edge="1" source="a3" target="uc19" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e22" style="edgeStyle=none;html=1;" edge="1" source="a3" target="uc20" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ===== INCLUDE / EXTEND ===== -->
+        <!-- Kelola Surat <<include>> Generate PDF -->
+        <mxCell id="e23" value="«include»" style="edgeStyle=none;html=1;dashed=1;endArrow=open;endFill=0;endSize=8;fontSize=11;" edge="1" source="uc04" target="uc05" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- Setujui & Tolak <<extend>> Lihat Pengajuan -->
+        <mxCell id="e24" value="«extend»" style="edgeStyle=none;html=1;dashed=1;endArrow=open;endFill=0;endSize=8;fontSize=11;" edge="1" source="uc10" target="uc09" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e25" value="«extend»" style="edgeStyle=none;html=1;dashed=1;endArrow=open;endFill=0;endSize=8;fontSize=11;" edge="1" source="uc11" target="uc09" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- Download <<extend>> Lihat Surat -->
+        <mxCell id="e26" value="«extend»" style="edgeStyle=none;html=1;dashed=1;endArrow=open;endFill=0;endSize=8;fontSize=11;" edge="1" source="uc15" target="uc14" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="jemaatsahala-diagram" name="JemaatSahala App">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="t1" value="Use Case Diagram — Aplikasi JemaatSahala (Web)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="8" width="880" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- System Boundary -->
+        <mxCell id="sb1" value="Aplikasi JemaatSahala (Web)" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;strokeColor=#0e7a0d;fillColor=#f8fff8;fontColor=#0e7a0d;fontStyle=1;fontSize=13;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="140" y="45" width="880" height="760" as="geometry" />
+        </mxCell>
+
+        <!-- ===== ACTORS ===== -->
+        <mxCell id="a1" value="Publik (Tamu)" style="shape=mxgraph.uml.actor;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="25" y="350" width="50" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a2" value="Jemaat (Login)" style="shape=mxgraph.uml.actor;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1095" y="350" width="50" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ===== SHARED: Login / Logout ===== -->
+        <mxCell id="uc01" value="Login" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f0f0f0;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="415" y="80" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc02" value="Logout" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f0f0f0;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="415" y="155" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===== PUBLIC USE CASES ===== -->
+        <mxCell id="uc03" value="Lihat Beranda" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="170" y="80" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc04" value="Lihat Pengumuman" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="170" y="165" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc05" value="Lihat Jadwal Kegiatan" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="170" y="250" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc06" value="Lihat Galeri Foto" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="170" y="335" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc07" value="Lihat Visi &amp; Misi" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="170" y="420" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc08" value="Lihat Profil Staf Gereja" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="170" y="505" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===== MEMBER USE CASES ===== -->
+        <mxCell id="uc09" value="Lihat Profil" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="650" y="245" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc10" value="Edit Profil" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="650" y="320" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc11" value="Lihat Daftar Surat" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="650" y="395" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc12" value="Cari Surat" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="650" y="470" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc13" value="Download PDF Surat" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="650" y="545" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc14" value="Ajukan Permohonan Surat" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="650" y="620" width="200" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc15" value="Lihat Riwayat Pengajuan" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="650" y="695" width="200" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===== ASSOCIATIONS — Publik ===== -->
+        <mxCell id="e01" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc01" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e02" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc03" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e03" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc04" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e04" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc05" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e05" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc06" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e06" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc07" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e07" style="edgeStyle=none;html=1;" edge="1" source="a1" target="uc08" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ===== ASSOCIATIONS — Jemaat ===== -->
+        <mxCell id="e08" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc01" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e09" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc02" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e10" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc09" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e11" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc10" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e12" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc11" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e13" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc12" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e14" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc13" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e15" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc14" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e16" style="edgeStyle=none;html=1;" edge="1" source="a2" target="uc15" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ===== INCLUDE / EXTEND ===== -->
+        <!-- Cari Surat <<extend>> Lihat Daftar Surat -->
+        <mxCell id="e17" value="«extend»" style="edgeStyle=none;html=1;dashed=1;endArrow=open;endFill=0;endSize=8;fontSize=11;" edge="1" source="uc12" target="uc11" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- Download PDF <<extend>> Lihat Daftar Surat -->
+        <mxCell id="e18" value="«extend»" style="edgeStyle=none;html=1;dashed=1;endArrow=open;endFill=0;endSize=8;fontSize=11;" edge="1" source="uc13" target="uc11" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- Lihat Riwayat <<extend>> Ajukan Permohonan -->
+        <mxCell id="e19" value="«extend»" style="edgeStyle=none;html=1;dashed=1;endArrow=open;endFill=0;endSize=8;fontSize=11;" edge="1" source="uc15" target="uc14" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

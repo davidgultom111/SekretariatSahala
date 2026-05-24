@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // Model Member merepresentasikan data jemaat GPdI di database
 class Member extends Model
@@ -40,20 +41,38 @@ class Member extends Model
     ];
 
     // Relasi: satu jemaat bisa memiliki banyak surat
-    public function letters()
+    public function letters(): HasMany
     {
         return $this->hasMany(Letter::class, 'member_id');
     }
 
     // Relasi: surat pernikahan di mana jemaat ini sebagai mempelai pria
-    public function marriageLettersAsPria()
+    public function marriageLettersAsPria(): HasMany
     {
-        return $this->hasMany(Letter::class, 'pria_id');
+        return $this->hasMany(Letter::class, 'member_pria_id');
     }
 
     // Relasi: surat pernikahan di mana jemaat ini sebagai mempelai wanita
-    public function marriageLettersAsWanita()
+    public function marriageLettersAsWanita(): HasMany
     {
-        return $this->hasMany(Letter::class, 'wanita_id');
+        return $this->hasMany(Letter::class, 'member_wanita_id');
+    }
+
+    // Relasi: satu jemaat bisa memiliki banyak pengajuan surat
+    public function pengajuans(): HasMany
+    {
+        return $this->hasMany(PengajuanSurat::class, 'member_id');
+    }
+
+    // Relasi: pengajuan pernikahan di mana jemaat ini sebagai mempelai pria
+    public function pengajuanPernikahanAsPria(): HasMany
+    {
+        return $this->hasMany(PengajuanSurat::class, 'member_pria_id');
+    }
+
+    // Relasi: pengajuan pernikahan di mana jemaat ini sebagai mempelai wanita
+    public function pengajuanPernikahanAsWanita(): HasMany
+    {
+        return $this->hasMany(PengajuanSurat::class, 'member_wanita_id');
     }
 }

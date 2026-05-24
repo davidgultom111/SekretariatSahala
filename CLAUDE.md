@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Sekretariat Jemaat** is a church secretary management system for Gereja Pentekosta di Indonesia (GPdI). It manages congregation members and generates official church letters/documents as PDFs. The system is a **pure REST API** (no web UI) consumed by a Laravel Blade admin frontend (port 8001) and mobile apps.
+**Sekretariat Jemaat** is a church secretary management system for Gereja Pentekosta di Indonesia (GPdI). It manages congregation members, generates official church letters/documents as PDFs, and exposes public content (schedules, gallery, announcements) for the church website. The system is a **pure REST API** (no web UI) consumed by a Laravel Blade admin frontend (port 8001) and mobile apps.
 
 ## Common Commands
 
@@ -59,27 +59,57 @@ Login uses `id_jemaat` (not email) + `password`. Default password on member crea
 
 `routes/web.php` is empty. All endpoints are in `routes/api.php`:
 
+**Public (no auth)**
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/auth/login` | Login → `{ member, token }` |
+| GET | `/api/health` | Health check |
+| GET | `/api/public/jadwal` | Jadwal pelayanan (website) |
+| GET | `/api/public/galeri` | Galeri foto (website) |
+| GET | `/api/public/pengumuman` | Pengumuman aktif (website) |
+
+**Member (`auth:sanctum`)**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
 | DELETE | `/api/me/logout` | Logout (revoke token) |
 | GET/PUT | `/api/me` | Own profile |
 | GET | `/api/me/letters` | Own letters (`keyword` querystring) |
 | GET | `/api/me/letters/{id}/download` | Download own letter PDF (stored only) |
-| GET | `/api/admin/members` | List members (`search`, `status`, `per_page`) |
-| POST | `/api/admin/members` | Create member |
+| GET | `/api/me/pengajuan` | Own pengajuan surat |
+| POST | `/api/me/pengajuan` | Submit pengajuan surat |
+
+**Admin (`auth:sanctum` + `role:admin`)**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET/POST | `/api/admin/members` | List / Create member |
 | GET/PUT/DELETE | `/api/admin/members/{id}` | Show / Update / Delete member |
-| GET | `/api/admin/letters` | List letters (`search`, `letter_type`, `per_page`) |
-| POST | `/api/admin/letters` | Create letter |
+| GET/POST | `/api/admin/letters` | List / Create letter |
 | GET/PUT/DELETE | `/api/admin/letters/{id}` | Show / Update / Delete letter |
-| GET | `/api/admin/letters/{id}/pdf` | Download PDF (generates on-the-fly if not stored) |
-| GET | `/api/health` | Health check |
+| GET | `/api/admin/letters/{id}/pdf` | Download PDF (generates on-the-fly if missing) |
+| GET/POST | `/api/admin/jadwal` | List / Create jadwal |
+| PUT/DELETE | `/api/admin/jadwal/{id}` | Update / Delete jadwal |
+| GET/POST | `/api/admin/galeri` | List / Upload foto |
+| DELETE | `/api/admin/galeri/{id}` | Delete foto |
+| GET/POST | `/api/admin/pengumuman` | List / Create pengumuman |
+| PUT/DELETE | `/api/admin/pengumuman/{id}` | Update / Delete pengumuman |
+| GET | `/api/admin/pengajuan` | List semua pengajuan |
+| GET | `/api/admin/pengajuan/{id}` | Show detail pengajuan |
+| PUT | `/api/admin/pengajuan/{id}/setujui` | Approve → buat Letter otomatis |
+| PUT | `/api/admin/pengajuan/{id}/tolak` | Reject pengajuan |
+| DELETE | `/api/admin/pengajuan/{id}` | Delete pengajuan |
 
 ### Core Models
 
-- **Member** (`app/Models/Member.php`) — Congregation members. `HasApiTokens`, `SoftDeletes`. Fields: `id_jemaat`, `nama_lengkap`, `jenis_kelamin` (`Laki-laki`|`Perempuan`), `tanggal_lahir`, `tempat_lahir`, `alamat`, `no_telepon`, `status_aktif` (`Aktif`|`Tidak Aktif`|`Dipindahkan`), `role` (`admin`|`member`), `password`.
+- **Member** (`app/Models/Member.php`) — Congregation members. `HasApiTokens`, `SoftDeletes`. Fields: `id_jemaat`, `nama_lengkap`, `jenis_kelamin` (`Laki-laki`|`Perempuan`), `tanggal_lahir`, `tempat_lahir`, `alamat`, `no_telepon`, `status_aktif` (`Aktif`|`Tidak Aktif`|`Dipindahkan`), `role` (`admin`|`member`), `password`. Relations: `letters()`, `marriageLettersAsPria/Wanita()`, `pengajuans()`, `pengajuanPernikahanAsPria/Wanita()`.
 - **Letter** (`app/Models/Letter.php`) — Church documents. BelongsTo `member` (primary), plus optional `memberPria`/`memberWanita` for marriage letters. Letter type stored in both `letter_type` (slug key) and `tipe_surat` (display name).
+- **PengajuanSurat** (`app/Models/PengajuanSurat.php`) — Member letter requests. `status`: `'Dalam Proses'` → `'Disetujui'` (creates a Letter) or `'Ditolak'`. Has same field set as `Letter` for each type, plus `catatan` (admin notes) and nullable `letter_id` (set on approval). FK to `Member` three times: `member_id`, `member_pria_id`, `member_wanita_id`.
 - **LetterNumberCounter** — Auto-increments per `letter_type` + `year`. Called inside `LetterTemplateService::generateLetterNumber()` which uses `firstOrCreate` + `increment` — not atomic; avoid concurrent writes.
+- **JadwalPelayanan** (`app/Models/JadwalPelayanan.php`) — Church service schedules. Fields: `nama_kegiatan`, `kategori`, `deskripsi`, `hari`, `waktu`, `urutan`, `aktif`. Standalone — no foreign keys.
+- **GaleriFoto** (`app/Models/GaleriFoto.php`) — Church photo gallery. `foto` stores the path on the `public` disk; `foto_url` is an appended accessor returning the full URL via `Storage::disk('public')->url()`. Standalone.
+- **Pengumuman** (`app/Models/Pengumuman.php`) — Church announcements. Fields: `judul`, `isi`, `tanggal_mulai`, `tanggal_akhir`, `aktif`. Standalone.
 - **User** — Standard Laravel model, unused by the API. `UserSeeder` seeds `admin@gereja.com` / `staff@gereja.com` but these accounts serve no function — API auth only uses `Member`.
 
 > `app/Models/Models/Letters/` and `app/Console/Commands/SetupMultipleDatabase.php` are legacy stubs from an abandoned multi-database architecture. Ignore them.
@@ -109,19 +139,26 @@ Letter numbers: `NNN/GPdI/SA/ABBREV/YEAR` (e.g. `001/GPdI/SA/SP/2026`). `generat
 ```
 204 No Content for `noContent()`.
 
-Controllers: `app/Http/Controllers/API/`
-- `BaseController` — response helpers
+Controllers under `app/Http/Controllers/API/`:
+- `BaseController` — response helpers (all controllers extend this)
 - `MemberAuthController` — login / logout
-- `MemberApiController` — member self-service
-- `Admin/MemberController` — full CRUD (admin only)
-- `Admin/LetterController` — CRUD + PDF (admin only)
+- `MemberApiController` — member self-service (profile, letters)
+- `Member/PengajuanController` — member submits pengajuan surat
+- `Admin/MemberController` — full CRUD
+- `Admin/LetterController` — CRUD + PDF generation
+- `Admin/PengajuanController` — review, approve, reject pengajuan
+- `Admin/JadwalController` — CRUD jadwal pelayanan
+- `Admin/GaleriController` — upload/delete galeri foto
+- `Admin/PengumumanController` — CRUD pengumuman
+- `Public/JadwalController`, `Public/GaleriController`, `Public/PengumumanController` — unauthenticated read-only endpoints for website
 
-Resources: `app/Http/Resources/MemberResource.php`, `LetterResource.php`.
-Form Requests: `app/Http/Requests/API/` and `Admin/` sub-namespace.
+Resources: `app/Http/Resources/MemberResource.php`, `LetterResource.php`. Other models return plain Eloquent collections.
+Form Requests: `app/Http/Requests/API/` (login, update biodata) and `Admin/` (store/update member, store letter).
 
 ### Key Business Logic
 
 - **`MemberObserver`** (`app/Observers/MemberObserver.php`) auto-generates `id_jemaat` as `DDMMYYYY` from `tanggal_lahir` on create; appends a numeric counter on duplicate. Regenerates if `tanggal_lahir` changes on update. Registered in `AppServiceProvider`.
+- **PengajuanSurat workflow**: Member submits via `POST /api/me/pengajuan`. Admin reviews and calls approve (`/setujui`) or reject (`/tolak`). On approval, `AdminPengajuanController` calls `LetterTemplateService` to create a `Letter` and sets `pengajuan_surat.letter_id` + `status = 'Disetujui'`.
 - **Soft-delete cascade**: The `letters` table has a DB-level `ON DELETE CASCADE` on `member_id`, but since `Member` uses `SoftDeletes`, a normal admin delete only sets `deleted_at` and does not trigger the DB cascade. Letters belonging to a soft-deleted member are not automatically removed — handle this explicitly if needed.
 - **PDF download difference**: `GET /api/me/letters/{id}/download` only serves pre-stored PDFs; `GET /api/admin/letters/{id}/pdf` generates on-the-fly via DomPDF if no stored file exists.
 - **CORS**: `config/cors.php` is configured for API routes. Set `FRONTEND_URL` in `.env` to the Nuxt.js origin. Wildcard `*` is incompatible with `supports_credentials=true`. `Content-Disposition` is in `exposed_headers` so browsers can read the filename on PDF downloads.
